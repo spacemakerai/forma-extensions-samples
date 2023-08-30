@@ -72,9 +72,6 @@ async function callDynamo() {
 
     const body = await bakeBody();
 
-    console.log(body);
-    return;
-
     const response = await fetch(dynamoUrl, {
       method: "POST",
       body: JSON.stringify(body),
