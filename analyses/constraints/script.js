@@ -8,13 +8,27 @@ const loader = new GLTFLoader();
 let dynamoUrl = localStorage.getItem("dynamo-url");
 const urlInput = document.getElementById("dynamo-url");
 
+let vizualizeIndex = localStorage.getItem("visualize");
+
+const vizualizeInput = document.getElementById("visualize");
+
 if (dynamoUrl) {
   urlInput.value = dynamoUrl;
+}
+
+if (vizualizeIndex) {
+  vizualizeInput.value = vizualizeIndex;
 }
 
 urlInput.onchange = function (e) {
   dynamoUrl = e.target.value;
   localStorage.setItem("dynamo-url", dynamoUrl);
+  callDynamo();
+};
+
+vizualizeInput.onchange = function (e) {
+  vizualizeIndex = e.target.value;
+  localStorage.setItem("visualize", vizualizeIndex);
 };
 
 function filterPositions(array) {
@@ -79,25 +93,32 @@ async function callDynamo() {
 
     const r = await response.json();
 
-    const geometry = r.geometry[12];
-    for (let entry of geometry.geometryEntries) {
-      loader.load("data:application/octet-stream;base64," + entry, (gltf) => {
-        const positions =
-          gltf.scenes[0].children[0].geometry.attributes.position.array;
+    if (!vizualizeIndex) {
+      return;
+    }
 
-        formaApi.draw.mesh.add("constraint-violation", {
-          position: filterPositions(positions),
-          index: [...gltf.scenes[0].children[0].geometry.getIndex().array],
-          color: new Uint8Array(
-            Array(
-              gltf.scenes[0].children[0].geometry.attributes.position.array
-                .length
-            )
-              .fill([255, 0, 0, 255])
-              .flat()
-          ),
+    for (let i in r.geometry) {
+      const geometry = r.geometry[vizualizeIndex];
+
+      for (let entry of geometry.geometryEntries) {
+        loader.load("data:application/octet-stream;base64," + entry, (gltf) => {
+          const positions =
+            gltf.scenes[0].children[0].geometry.attributes.position.array;
+
+          formaApi.draw.mesh.add("constraint-violation", {
+            position: filterPositions(positions),
+            index: [...gltf.scenes[0].children[0].geometry.getIndex().array],
+            color: new Uint8Array(
+              Array(
+                gltf.scenes[0].children[0].geometry.attributes.position.array
+                  .length
+              )
+                .fill([255, 0, 0, 255])
+                .flat()
+            ),
+          });
         });
-      });
+      }
     }
   } catch (e) {
     console.error(e);
