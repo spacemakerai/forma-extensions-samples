@@ -40,7 +40,7 @@ In this first step we will set the sun position to the current time of the users
 So add the following to the `script.js` file
 
 ```js
-await formaApi.ui.sun.set(new Date())
+await sunApi.setDate(new Date())
 ```
 
 Here you can see that the `sun` api, which has a `set` and `get` method is located under
@@ -57,11 +57,11 @@ can be done by asking the `camera` to take a picture. It will use the current
 camera position from the application. (This can programtically be set by the `camera` api).
 
 ```js
-const dataUrl = await formaApi.ui.camera.capture(1024, 768);
+const canvas = await cameraApi.capture(1024, 768);
 ```
 
 You can see that we provide the resolution of the camera to the api call. The return 
-type of this method is a data url with an encode png picture. 
+type of this method is a html canvas with the picture. 
 
 ### Step four - storing the screenshot
 
@@ -69,7 +69,7 @@ We can use the following snippet to store this as a file.
 
 ```js
 const save_link = document.createElement("a");
-save_link.href = url;
+save_link.href = canvas.toDataUel("image/png");
 save_link.download = "screenshot.png";
 const event = new MouseEvent("click", { bubbles: false, cancelable: false });
 save_link.dispatchEvent(event);
@@ -80,12 +80,12 @@ save_link.dispatchEvent(event);
 To tie this altogether we capture the original sun position before and reset it after:
 
 ```js
-const original = await formaApi.ui.sun.get()
+const original = await sunApi.getDate()
 
 
 // ...
 
 
-await formaApi.ui.sun.set(original);
+await sunApi.setDate(original);
 
 ```
