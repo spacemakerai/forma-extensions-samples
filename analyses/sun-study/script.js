@@ -1,10 +1,4 @@
-import { EmbeddedViewSdk } from "./forma-embedded-view-sdk/index.js";
-import { SunApi } from "./forma-embedded-view-sdk/sun.js";
-import { CameraApi } from "./forma-embedded-view-sdk/camera.js";
-const { origin } = EmbeddedViewSdk.parseHostParams();
-const sdk = new EmbeddedViewSdk({ origin });
-const sunApi = new SunApi(sdk);
-const cameraApi = new CameraApi(sdk);
+import { Forma } from "https://esm.sh/forma-embedded-view-sdk/auto";
 
 const timeindicator = document.getElementById("timeindicator");
 
@@ -46,7 +40,7 @@ document.getElementById("interval").onchange = updateTimeIndicator;
 
 document.getElementById("run").onclick = async () => {
   try {
-    const existingDate = await sunApi.getDate();
+    const existingDate = await Forma.sun.getDate();
 
     const month = parseInt(document.getElementById("month").value, 10);
     const day = parseInt(document.getElementById("day").value, 10);
@@ -78,20 +72,20 @@ document.getElementById("run").onclick = async () => {
     endDate.setSeconds(0);
 
     while (startDate.getTime() <= endDate.getTime()) {
-      await sunApi.setDate({ date: startDate });
+      await Forma.sun.setDate({ date: startDate });
       await saveScreen(startDate.toString(), width, height);
 
       startDate.setTime(startDate.getTime() + interval * 60 * 1000);
     }
 
-    await sunApi.setDate({ date: existingDate });
+    await Forma.sun.setDate({ date: existingDate });
   } catch (e) {
     console.log(e);
   }
 };
 
 async function saveScreen(name, width, height) {
-  const canvas = await cameraApi.capture({ width, height });
+  const canvas = await Forma.camera.capture({ width, height });
 
   const save_link = document.createElement("a");
   save_link.href = canvas.toDataURL("image/png");
