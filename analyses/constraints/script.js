@@ -10,27 +10,14 @@ const loader = new GLTFLoader();
 let dynamoUrl = localStorage.getItem("dynamo-url");
 const urlInput = document.getElementById("dynamo-url");
 
-let vizualizeIndex = localStorage.getItem("visualize");
-
-const vizualizeInput = document.getElementById("visualize");
-
 if (dynamoUrl) {
   urlInput.value = dynamoUrl;
-}
-
-if (vizualizeIndex) {
-  vizualizeInput.value = vizualizeIndex;
 }
 
 urlInput.onchange = function (e) {
   dynamoUrl = e.target.value;
   localStorage.setItem("dynamo-url", dynamoUrl);
   callDynamo();
-};
-
-vizualizeInput.onchange = function (e) {
-  vizualizeIndex = e.target.value;
-  localStorage.setItem("visualize", vizualizeIndex);
 };
 
 function filterPositions(array) {
@@ -49,7 +36,7 @@ function filterPositions(array) {
 async function bakeBody() {
   const rootUrn = await Forma.proposal.getRootUrn();
 
-  /*const proposal = (
+  const proposal = (
     await Promise.all(
       (
         await Forma.geometry.getPathsByCategory({
@@ -65,7 +52,7 @@ async function bakeBody() {
           })
         )
     )
-  ).map((a) => Array.from(a));*/
+  ).map((a) => Array.from(a));
   const constraints = (
     await Promise.all(
       (
@@ -82,13 +69,6 @@ async function bakeBody() {
     )
   ).map((a) => Array.from(a));
 
-  const proposal = [
-    await Forma.geometry.getTriangles({
-      urn: await Forma.proposal.getRootUrn(),
-      path: "root/7de2a72",
-    }),
-  ].map((a) => Array.from(a));
-
   return {
     ...body,
     inputs: [
@@ -103,16 +83,6 @@ async function bakeBody() {
     ],
   };
 }
-
-let urn = null;
-/*setInterval(() => {
-  const curr = Forma.proposal.getRootUrn();
-
-  if (curr !== urn) {
-    urn = curr;
-    callDynamo();
-  }
-}, 100);*/
 
 function toNonIndexed(positions, index) {
   const res = new Float32Array(index.length * 3);
@@ -160,28 +130,25 @@ async function callDynamo() {
 
     const r = await response.json();
 
-    console.log(r.geometry.length);
-
-    if (!vizualizeIndex) {
-      console.log(vizualizeIndex);
-      return;
-    } else {
-      console.log("wat");
+    const outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = "";
+    for (let geometry of r.geometry) {
+      for (let entry of geometry.geometryEntries) {
+        const button = document.createElement("button");
+        button.innerText = geometry.id.substring(0, 10);
+        button.title = geometry.id;
+        button.onclick = async () => {
+          loader.load(
+            "data:application/octet-stream;base64," + entry,
+            async (gltf) => {
+              await render(gltf.scenes[0].children[0].geometry);
+            }
+          );
+        };
+        outputDiv.appendChild(button);
+      }
     }
-
-    const geometry = r.geometry[vizualizeIndex];
-
-    for (let entry of geometry.geometryEntries) {
-      loader.load(
-        "data:application/octet-stream;base64," + entry,
-        async (gltf) => {
-          const { geometry } = gltf.scenes[0].children[0];
-
-          console.log("render");
-          await render(geometry);
-        }
-      );
-    }
+    console.log("done");
   } catch (e) {
     console.error(e);
   }
