@@ -1,5 +1,7 @@
-import formaApi from "https://app.autodeskforma.eu/extensions/preview/sdk.js";
+import { Forma } from "forma";
 import { body } from "./request.js";
+
+window.Forma = Forma;
 
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
@@ -45,20 +47,47 @@ function filterPositions(array) {
 }
 
 async function bakeBody() {
-  const proposal = (
+  const rootUrn = await Forma.proposal.getRootUrn();
+
+  /*const proposal = (
     await Promise.all(
-      (await formaApi.getPathsByCategory("generic"))
+      (
+        await Forma.geometry.getPathsByCategory({
+          urn: rootUrn,
+          category: "generic",
+        })
+      )
         .filter((path) => path.split("/").length === 2)
-        .map((path) => formaApi.geometry.getTriangles(path))
+        .map((path) =>
+          Forma.geometry.getTriangles({
+            urn: rootUrn,
+            path,
+          })
+        )
     )
-  ).map((a) => Array.from(a));
+  ).map((a) => Array.from(a));*/
   const constraints = (
     await Promise.all(
       (
-        await formaApi.getPathsByCategory("constraints")
-      ).map((path) => formaApi.geometry.getTriangles(path))
+        await Forma.geometry.getPathsByCategory({
+          urn: rootUrn,
+          category: "constraints",
+        })
+      ).map((path) =>
+        Forma.geometry.getTriangles({
+          urn: rootUrn,
+          path,
+        })
+      )
     )
   ).map((a) => Array.from(a));
+
+  const proposal = [
+    await Forma.geometry.getTriangles({
+      urn: await Forma.proposal.getRootUrn(),
+      path: "root/7de2a72",
+    }),
+  ].map((a) => Array.from(a));
 
   return {
     ...body,
@@ -75,15 +104,53 @@ async function bakeBody() {
   };
 }
 
-callDynamo();
-formaApi.addEventListener("model", () => {
-  callDynamo();
-});
+let urn = null;
+/*setInterval(() => {
+  const curr = Forma.proposal.getRootUrn();
+
+  if (curr !== urn) {
+    urn = curr;
+    callDynamo();
+  }
+}, 100);*/
+
+function toNonIndexed(positions, index) {
+  const res = new Float32Array(index.length * 3);
+
+  for (let i = 0; i < index.length; i++) {
+    const idx = index[i] * 3;
+    res[i * 3 + 0] = positions[idx + 0];
+    res[i * 3 + 1] = positions[idx + 1];
+    res[i * 3 + 2] = positions[idx + 2];
+  }
+
+  return res;
+}
+
+async function render(geometry) {
+  const positions = geometry.attributes.position.array;
+  const index = [...geometry.getIndex().array];
+  const position = filterPositions(positions);
+
+  const nonIndexPositions = toNonIndexed(position, index);
+  const color = Array(nonIndexPositions.length / 3)
+    .fill([255, 0, 0, 255])
+    .flat();
+
+  await Forma.render.updateMesh({
+    id: "constraints",
+    geometryData: {
+      position: nonIndexPositions,
+      index,
+      color: new Uint8Array(color),
+    },
+  });
+}
 
 async function callDynamo() {
+  console.log("callDynamo");
   try {
-    await formaApi.draw.mesh.remove("constraint-violation");
-
+    console.log("bake");
     const body = await bakeBody();
 
     const response = await fetch(dynamoUrl, {
@@ -93,34 +160,31 @@ async function callDynamo() {
 
     const r = await response.json();
 
+    console.log(r.geometry.length);
+
     if (!vizualizeIndex) {
+      console.log(vizualizeIndex);
       return;
+    } else {
+      console.log("wat");
     }
 
-    for (let i in r.geometry) {
-      const geometry = r.geometry[vizualizeIndex];
+    const geometry = r.geometry[vizualizeIndex];
 
-      for (let entry of geometry.geometryEntries) {
-        loader.load("data:application/octet-stream;base64," + entry, (gltf) => {
-          const positions =
-            gltf.scenes[0].children[0].geometry.attributes.position.array;
+    for (let entry of geometry.geometryEntries) {
+      loader.load(
+        "data:application/octet-stream;base64," + entry,
+        async (gltf) => {
+          const { geometry } = gltf.scenes[0].children[0];
 
-          formaApi.draw.mesh.add("constraint-violation", {
-            position: filterPositions(positions),
-            index: [...gltf.scenes[0].children[0].geometry.getIndex().array],
-            color: new Uint8Array(
-              Array(
-                gltf.scenes[0].children[0].geometry.attributes.position.array
-                  .length
-              )
-                .fill([255, 0, 0, 255])
-                .flat()
-            ),
-          });
-        });
-      }
+          console.log("render");
+          await render(geometry);
+        }
+      );
     }
   } catch (e) {
     console.error(e);
   }
 }
+
+document.getElementById("run").onclick = callDynamo;
