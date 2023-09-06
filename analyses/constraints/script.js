@@ -127,8 +127,23 @@ function DynamoRunner({ url }) {
     setIsLoading(false);
   }, []);
 
+  const downloadRequest = useCallback(async () => {
+    const body = await bakeBody(config);
+
+    const save_link = document.createElement("a");
+    save_link.href = `data:application/json;${JSON.stringify(body)}`;
+    save_link.download = (await Forma.proposal.getId()) + ".json";
+    const event = new MouseEvent("click", {
+      bubbles: false,
+      cancelable: false,
+    });
+    save_link.dispatchEvent(event);
+  }, [config]);
+
   return html`
     <div>${isLoading && "loading"}</div>
+
+    <button onclick=${downloadRequest}>Download request</button><br />
 
     Facade minimum distance
     <input
@@ -239,21 +254,23 @@ async function bakeBody(config) {
     )
   ).map((a) => Array.from(a));
 
-  const surroundings = await Promise.all(
-    (
-      await Forma.geometry.getPathsByCategory({
-        urn: rootUrn,
-        category: "building",
-      })
-    )
-      .filter((path) => path.split("/").length === 3)
-      .map((path) =>
-        Forma.geometry.getTriangles({
+  const surroundings = (
+    await Promise.all(
+      (
+        await Forma.geometry.getPathsByCategory({
           urn: rootUrn,
-          path,
+          category: "building",
         })
       )
-  );
+        .filter((path) => path.split("/").length === 3)
+        .map((path) =>
+          Forma.geometry.getTriangles({
+            urn: rootUrn,
+            path,
+          })
+        )
+    )
+  ).map((a) => Array.from(a));
 
   const constraints = (
     await Promise.all(
@@ -284,7 +301,7 @@ async function bakeBody(config) {
       },
       {
         nodeId: "57d3a29891014ef89bac997b62da4123",
-        value: JSON.stringify(config),
+        value: JSON.stringify(config || {}),
       },
       {
         nodeId: "57d3a29891014ef89bac997b62da4124",
