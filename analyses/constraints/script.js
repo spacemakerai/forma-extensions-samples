@@ -219,12 +219,16 @@ async function bakeBody(config) {
 
   const proposal = (
     await Promise.all(
-      (
-        await Forma.geometry.getPathsByCategory({
+      [
+        ...(await Forma.geometry.getPathsByCategory({
+          urn: rootUrn,
+          category: "building",
+        })),
+        ...(await Forma.geometry.getPathsByCategory({
           urn: rootUrn,
           category: "generic",
-        })
-      )
+        })),
+      ]
         .filter((path) => path.split("/").length === 2)
         .map((path) =>
           Forma.geometry.getTriangles({
