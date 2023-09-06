@@ -9,6 +9,8 @@ import htm from "https://esm.sh/htm";
 const html = htm.bind(h);
 const loader = new GLTFLoader();
 
+window.Forma = Forma;
+
 function RenderGeometry({ geometry, active, onToggleActive }) {
   const onEnter = useCallback(async () => {
     const geometryData = await generateGeometry(geometry.geometryEntries[0]);
@@ -54,36 +56,48 @@ function RenderGeometry({ geometry, active, onToggleActive }) {
 }
 
 function RenderGeometries({ geometry, active, onToggleActive }) {
-  return (geometry || []).map(
-    (geometry) =>
-      html` <${RenderGeometry}
-        geometry=${geometry}
-        active=${active}
-        onToggleActive=${onToggleActive}
-      />`
-  );
+  return html`
+    Output:
+    ${(geometry || []).map(
+      (geometry) =>
+        html` <${RenderGeometry}
+          geometry=${geometry}
+          active=${active}
+          onToggleActive=${onToggleActive}
+        />`
+    )}
+  `;
 }
 
 let initialActive = {};
 try {
   initialActive = JSON.parse(
-    localStorage.getItem(`dynamo-active-${Forma.getProjectId()}}`) || {}
+    localStorage.getItem(`dynamo-active-${Forma.getProjectId()}}`) || "{}"
   );
 } catch (e) {
   console.warn("Errornous cache value for dynamo-active ignored");
+}
+
+let initialConfig = {};
+try {
+  initialConfig = JSON.parse(
+    localStorage.getItem(`dynamo-config-${Forma.getProjectId()}}`) || "{}"
+  );
+} catch (e) {
+  console.warn("Errornous cache value for dynamo-config ignored");
 }
 
 function DynamoRunner({ url }) {
   const [active, setActive] = useState(initialActive);
   const [geometry, setGeometry] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [config, setConfig] = useState(initialConfig);
 
   useEffect(async () => {
     let rootUrn = await Forma.proposal.getRootUrn();
     const id = setInterval(async () => {
       const urn = await Forma.proposal.getRootUrn();
       if (urn !== rootUrn) {
-        console.log("updated", urn);
         setIsLoading(true);
         setGeometry(null);
         setGeometry(await callDynamo(url));
@@ -109,11 +123,52 @@ function DynamoRunner({ url }) {
 
   useEffect(async () => {
     setIsLoading(true);
-    setGeometry(await callDynamo(url));
+    setGeometry(await callDynamo(url, config));
     setIsLoading(false);
   }, []);
+
   return html`
     <div>${isLoading && "loading"}</div>
+
+    Facade minimum distance
+    <input
+      type="number"
+      defaultValue="${config.facadeDistance}"
+      onchange=${(e) => {
+        const updated = {
+          ...config,
+          facadeDistance: parseInt(e.target.value, 10),
+        };
+
+        setConfig(updated);
+
+        localStorage.setItem(
+          `dynamo-config-${Forma.getProjectId()}}`,
+          JSON.stringify(updated)
+        );
+      }}
+    />
+    <br />
+
+    Facade buffer
+    <input
+      type="number"
+      defaultValue="${config.facadeBuffer}"
+      onchange=${(e) => {
+        const updated = {
+          ...config,
+          facadeBuffer: parseInt(e.target.value, 10),
+        };
+
+        setConfig(updated);
+
+        localStorage.setItem(
+          `dynamo-config-${Forma.getProjectId()}}`,
+          JSON.stringify(updated)
+        );
+      }}
+    />
+    <br />
 
     <${RenderGeometries}
       geometry=${geometry}
@@ -159,7 +214,7 @@ function filterPositions(array) {
   return res;
 }
 
-async function bakeBody() {
+async function bakeBody(config) {
   const rootUrn = await Forma.proposal.getRootUrn();
 
   const proposal = (
@@ -179,6 +234,23 @@ async function bakeBody() {
         )
     )
   ).map((a) => Array.from(a));
+
+  const surroundings = await Promise.all(
+    (
+      await Forma.geometry.getPathsByCategory({
+        urn: rootUrn,
+        category: "building",
+      })
+    )
+      .filter((path) => path.split("/").length === 3)
+      .map((path) =>
+        Forma.geometry.getTriangles({
+          urn: rootUrn,
+          path,
+        })
+      )
+  );
+
   const constraints = (
     await Promise.all(
       (
@@ -205,6 +277,14 @@ async function bakeBody() {
       {
         nodeId: "61ac694796d9473d8c24b94c24df829f",
         value: JSON.stringify(proposal),
+      },
+      {
+        nodeId: "57d3a29891014ef89bac997b62da4123",
+        value: JSON.stringify(config),
+      },
+      {
+        nodeId: "57d3a29891014ef89bac997b62da4124",
+        value: JSON.stringify(surroundings),
       },
     ],
   };
@@ -253,9 +333,9 @@ async function generateGeometry(entry) {
   };
 }
 
-async function callDynamo(url) {
+async function callDynamo(url, config) {
   try {
-    const body = await bakeBody();
+    const body = await bakeBody(config);
 
     const response = await fetch(url, {
       method: "POST",
