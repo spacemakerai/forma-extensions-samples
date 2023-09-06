@@ -1,24 +1,150 @@
-import { Forma } from "forma";
+import { Forma } from "https://esm.sh/forma-embedded-view-sdk/auto";
 import { body } from "./request.js";
-
-window.Forma = Forma;
-
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { h, render } from "https://esm.sh/preact";
+import { useState, useCallback, useEffect } from "https://esm.sh/preact/compat";
+import htm from "https://esm.sh/htm";
 
+// Initialize htm with Preact
+const html = htm.bind(h);
 const loader = new GLTFLoader();
 
-let dynamoUrl = localStorage.getItem("dynamo-url");
-const urlInput = document.getElementById("dynamo-url");
+function RenderGeometry({ geometry, active, onToggleActive }) {
+  const onEnter = useCallback(async () => {
+    const geometryData = await generateGeometry(geometry.geometryEntries[0]);
 
-if (dynamoUrl) {
-  urlInput.value = dynamoUrl;
+    if (geometryData) {
+      await Forma.render.updateMesh({
+        id: geometry.id,
+        geometryData,
+      });
+    }
+  });
+
+  useEffect(async () => {
+    if (active[geometry.id]) {
+      const geometryData = await generateGeometry(geometry.geometryEntries[0]);
+      if (geometryData) {
+        await Forma.render.updateMesh({
+          id: geometry.id,
+          geometryData,
+        });
+      }
+    }
+  }, [active]);
+
+  const onExit = useCallback(async () => {
+    const geometryData = await generateGeometry(geometry.geometryEntries[0]);
+    if (!active[geometry.id] && geometryData)
+      await Forma.render.remove({
+        id: geometry.id,
+      });
+  });
+
+  return html`
+    <button
+      class=${active[geometry.id] ? "selected" : ""}
+      onmouseenter=${onEnter}
+      onmouseleave=${onExit}
+      onclick=${() => onToggleActive(geometry.id)}
+    >
+      ${geometry.id.substring(0, 10)}
+    </button>
+  `;
 }
 
-urlInput.onchange = function (e) {
-  dynamoUrl = e.target.value;
-  localStorage.setItem("dynamo-url", dynamoUrl);
-  callDynamo();
-};
+function RenderGeometries({ geometry, active, onToggleActive }) {
+  return (geometry || []).map(
+    (geometry) =>
+      html` <${RenderGeometry}
+        geometry=${geometry}
+        active=${active}
+        onToggleActive=${onToggleActive}
+      />`
+  );
+}
+
+let initialActive = {};
+try {
+  initialActive = JSON.parse(
+    localStorage.getItem(`dynamo-active-${Forma.getProjectId()}}`) || {}
+  );
+} catch (e) {
+  console.warn("Errornous cache value for dynamo-active ignored");
+}
+
+function DynamoRunner({ url }) {
+  const [active, setActive] = useState(initialActive);
+  const [geometry, setGeometry] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(async () => {
+    let rootUrn = await Forma.proposal.getRootUrn();
+    const id = setInterval(async () => {
+      const urn = await Forma.proposal.getRootUrn();
+      if (urn !== rootUrn) {
+        console.log("updated", urn);
+        setIsLoading(true);
+        setGeometry(null);
+        setGeometry(await callDynamo(url));
+        setIsLoading(false);
+        rootUrn = urn;
+      }
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, []);
+
+  const onToggleActive = useCallback(
+    (id) => {
+      const updated = { ...active, [id]: !active[id] };
+      setActive(updated);
+      localStorage.setItem(
+        `dynamo-active-${Forma.getProjectId()}}`,
+        JSON.stringify(updated)
+      );
+    },
+    [active]
+  );
+
+  useEffect(async () => {
+    setIsLoading(true);
+    setGeometry(await callDynamo(url));
+    setIsLoading(false);
+  }, []);
+  return html`
+    <div>${isLoading && "loading"}</div>
+
+    <${RenderGeometries}
+      geometry=${geometry}
+      active=${active}
+      onToggleActive=${onToggleActive}
+    />
+  `;
+}
+
+function App(props) {
+  const [url, setUrl] = useState(localStorage.getItem("dynamo-url") || null);
+
+  const onChange = useCallback((e) => {
+    const { value } = e.target;
+    localStorage.setItem("dynamo-url", value);
+    setUrl(value);
+  });
+
+  return html`
+    <div>
+      <h1>Constraints</h1>
+
+      <input defaultValue=${url} onchange=${onChange} />
+
+      ${!url && "Set dynamo url to start"}
+      ${url && html`<${DynamoRunner} url=${url} />`}
+    </div>
+  `;
+}
+
+render(html`<${App} />`, document.body);
 
 function filterPositions(array) {
   const res = new Float32Array(array.length / 2);
@@ -97,7 +223,20 @@ function toNonIndexed(positions, index) {
   return res;
 }
 
-async function render(geometry) {
+async function generateGeometry(entry) {
+  const geometry = await new Promise((resolve) => {
+    loader.load(
+      "data:application/octet-stream;base64," + entry,
+      async (gltf) => {
+        resolve(gltf.scenes[0].children[0].geometry);
+      }
+    );
+  });
+
+  if (!geometry.getIndex()) {
+    return null;
+  }
+
   const positions = geometry.attributes.position.array;
   const index = [...geometry.getIndex().array];
   const position = filterPositions(positions);
@@ -107,51 +246,26 @@ async function render(geometry) {
     .fill([255, 0, 0, 255])
     .flat();
 
-  await Forma.render.updateMesh({
-    id: "constraints",
-    geometryData: {
-      position: nonIndexPositions,
-      index,
-      color: new Uint8Array(color),
-    },
-  });
+  return {
+    position: nonIndexPositions,
+    index,
+    color: new Uint8Array(color),
+  };
 }
 
-async function callDynamo() {
-  console.log("callDynamo");
+async function callDynamo(url) {
   try {
-    console.log("bake");
     const body = await bakeBody();
 
-    const response = await fetch(dynamoUrl, {
+    const response = await fetch(url, {
       method: "POST",
       body: JSON.stringify(body),
     });
 
     const r = await response.json();
 
-    const outputDiv = document.getElementById("output");
-    outputDiv.innerHTML = "";
-    for (let geometry of r.geometry) {
-      for (let entry of geometry.geometryEntries) {
-        const button = document.createElement("button");
-        button.innerText = geometry.id.substring(0, 10);
-        button.title = geometry.id;
-        button.onclick = async () => {
-          loader.load(
-            "data:application/octet-stream;base64," + entry,
-            async (gltf) => {
-              await render(gltf.scenes[0].children[0].geometry);
-            }
-          );
-        };
-        outputDiv.appendChild(button);
-      }
-    }
-    console.log("done");
+    return r.geometry;
   } catch (e) {
     console.error(e);
   }
 }
-
-document.getElementById("run").onclick = callDynamo;
