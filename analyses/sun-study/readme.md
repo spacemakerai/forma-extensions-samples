@@ -1,8 +1,8 @@
-# This is an example forma extension by Autodesk
+# This is an example extension for Autodesk Forma
 
-This extension is built using the **Forma SDK for Javascript** using an `Embedded View` in the `Right hand side analaysis panel`
+This extension is built using the **[Forma SDK for Javascript](https://aps-dev.autodesk.com/en/docs/forma/v1/reference/embedded-view-sdk/)** using an `Embedded View` in the `Right hand side analysis panel`
 
-**What is does:** Lets the user select a time range, date, and inverval to generate a sun study consisting of screenshots of the selected sun positions. 
+**What it does:** Lets the user select a time range, date, and inverval to generate a sun study consisting of screenshots of the selected sun positions. 
 
 ## How was this built
 
@@ -10,7 +10,7 @@ The extension is composed by 3 files, `index.html`, `script.js` and `style.css` 
 
 This document will go through step by step how you would build the main functionality of this extension. In the walkthrough we will only be using a single `index.html` with an inline `script` tag for the code. The code in this repo is a real extension that we expose to our users so we will gloss over the non Forma specific parts which makes it user friendly. The extension is written without any libraries (except the Forma SDK), and thus the code is quite verbose. We encourage using a modern UI stack to build extension.
 
-### Step one - the staring point
+### Step one - the starting point
 
 The starting point of this extension is the following file: 
 
