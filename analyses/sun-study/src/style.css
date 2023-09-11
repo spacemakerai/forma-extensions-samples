@@ -1,13 +1,7 @@
-body {
-}
-
 h1 {
   font-weight: 500;
   font-size: 12px;
-  font-family: "Artifakt Element", sans-serif;
-}
-
-h2 {
+  font-family: 'Artifakt Element', sans-serif;
 }
 
 svg.icon {
@@ -35,7 +29,7 @@ input,
 select,
 button {
   height: 24px;
-  font-family: "Artifakt Element", sans-serif;
+  font-family: 'Artifakt Element', sans-serif;
   font-size: 11px;
   border: 1px solid #80808088;
 }
