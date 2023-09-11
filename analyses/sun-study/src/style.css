@@ -77,7 +77,7 @@ button.export {
 .timeindicator {
   height: 10px;
   display: flex;
-  widthd: 212px;
+  width: 212px;
 }
 
 .timeindicator .pre-line {

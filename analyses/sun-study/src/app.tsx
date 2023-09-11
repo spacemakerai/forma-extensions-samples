@@ -5,7 +5,7 @@ import _ from 'lodash'
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-async function saveScreen(name, width, height) {
+async function saveScreen(name: string, width: number, height: number) {
   const canvas = await Forma.camera.capture({ width, height });
 
   const save_link = document.createElement("a");
@@ -68,10 +68,10 @@ export function App() {
       <div class={"section"}>
         <CalendarIcon />
         <div class="selectors">
-          <select class="month" value={month} onchange={e => setMonth(e.target.value)}>
+          <select class="month" value={month} onChange={e => setMonth(e.target.value)}>
             {MONTHS.map((name, value) => <option value={value}>{name}</option>)}
           </select>
-          <select class="date" value={day} onchange={e => setDay(e.target.value)}>
+          <select class="date" value={day} onChange={e => setDay(e.target.value)}>
             {_.range(1, 31).map(value => <option value={value}>{value}</option>)}
           </select>
         </div>
@@ -79,7 +79,7 @@ export function App() {
 
 
       <div class="section">
-        <select id="interval" class="large" value={interval} onchange={e => setInterval(e.target.value)}>
+        <select id="interval" class="large" value={interval} onChange={e => setInterval(e.target.value)}>
           <option value="5">Image every 5th minute</option>
           <option value="15">Image every 15th minute</option>
           <option value="30">Image every 30th minute</option>
@@ -89,17 +89,17 @@ export function App() {
       </div>
 
       <div class="section">
-        <select class="timepicker" value={startHour} onchange={e => setStartHour(e.target.value)}>
+        <select class="timepicker" value={startHour} onChange={e => setStartHour(e.target.value)}>
           {_.range(25).map(value => <option value={value}>{value < 10 ? "0" + value : value}</option>)}
         </select>
-        <select class="timepicker" value={startMinute} onchange={e => setStartMinute(e.target.value)}>
+        <select class="timepicker" value={startMinute} onChange={e => setStartMinute(e.target.value)}>
           {_.range(60).map(value => <option value={value}>{value < 10 ? "0" + value : value}</option>)}
         </select>
         -
-        <select class="timepicker" value={endHour} onchange={e => setEndHour(e.target.value)}>
+        <select class="timepicker" value={endHour} onChange={e => setEndHour(e.target.value)}>
           {_.range(25).map(value => <option value={value}>{value < 10 ? "0" + value : value}</option>)}
         </select>
-        <select class="timepicker" value={endMinute} onchange={e => setEndMinute(e.target.value)}>
+        <select class="timepicker" value={endMinute} onChange={e => setEndMinute(e.target.value)}>
           {_.range(60).map(value => <option value={value}>{value < 10 ? "0" + value : value}</option>)}
         </select>
       </div>
@@ -115,7 +115,7 @@ export function App() {
       </div>
 
       <div class="section">
-        <select class="large" value={resolution} onchange={e => setResolution(e.target.value)}>
+        <select class="large" value={resolution} onChange={e => setResolution(e.target.value)}>
           <option value="512x384">Small (512x384)</option>
           <option value="1024x768">Medium (1024x768)</option>
           <option value="2048x1536">Large (2048x1536)</option>
@@ -124,7 +124,7 @@ export function App() {
       </div>
 
       <div class="section">
-        <button class="export" onclick={onCLickRun}>Export Images</button>
+        <button class="export" onClick={onCLickRun}>Export Images</button>
       </div>
     </>
   )

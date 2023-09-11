@@ -9,13 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "forma-embedded-view-sdk": "^0.7.1",
+    "forma-embedded-view-sdk": "^0.10.2",
     "lodash": "^4.17.21",
     "preact": "^10.16.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
     "typescript": "^5.0.2",
+    "@types/lodash": "4.14.198",
     "vite": "^4.4.5"
   }
 }
