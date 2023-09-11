@@ -2,6 +2,8 @@ import { CalendarIcon } from "./assets/CalendarIcon";
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { useState } from "preact/hooks";
 import _ from "lodash";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 const MONTHS = [
   "January",
@@ -23,18 +25,6 @@ const minutesToPixels = (minutes: number) => {
   return Math.floor((minutes * INDICATOR_WIDTH) / (24 * 60));
 };
 
-async function saveScreen(name: string, resolution: string) {
-  const width = parseInt(resolution.split("x")[0], 10);
-  const height = parseInt(resolution.split("x")[1], 10);
-  const canvas = await Forma.camera.capture({ width, height });
-
-  const downloadLink = document.createElement("a");
-  downloadLink.href = canvas.toDataURL("image/png");
-  downloadLink.download = name + ".png";
-  const event = new MouseEvent("click", { bubbles: false, cancelable: false });
-  downloadLink.dispatchEvent(event);
-}
-
 export function App() {
   const [month, setMonth] = useState(6);
   const [day, setDay] = useState(15);
@@ -54,12 +44,25 @@ export function App() {
       const currentDate = await Forma.sun.getDate();
       const startDate = new Date(currentDate.getFullYear(), month, day, startHour, startMinute, 0, 0);
       const endDate = new Date(currentDate.getFullYear(), month, day, endHour, endMinute, 0, 0);
+      const width = parseInt(resolution.split("x")[0], 10);
+      const height = parseInt(resolution.split("x")[1], 10);
+
+      const zip = new JSZip();
+      const zipFolder = zip.folder("shadow-study") as JSZip;
 
       while (startDate.getTime() <= endDate.getTime()) {
         await Forma.sun.setDate({ date: startDate });
-        await saveScreen(startDate.toString(), resolution);
+
+        const filename = startDate.toString() + ".png";
+        const canvas = await Forma.camera.capture({ width, height });
+        const data = canvas.toDataURL().split("base64,")[1];
+        zipFolder.file(filename, data, { base64: true });
+
         startDate.setTime(startDate.getTime() + interval * 60 * 1000);
       }
+
+      zipFolder.generateAsync({ type: "blob" }).then((content) => saveAs(content, "shadow-study.zip"));
+
       await Forma.sun.setDate({ date: currentDate });
     } catch (e) {
       console.log(e);
