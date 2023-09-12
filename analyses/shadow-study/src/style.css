@@ -1,0 +1,108 @@
+h1 {
+  font-weight: 500;
+  font-size: 12px;
+  font-family: 'Artifakt Element', sans-serif;
+}
+
+svg.icon {
+  height: 16px;
+  width: 16px;
+  display: block;
+  margin: auto;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.section {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 10px 0;
+}
+
+input,
+select,
+button {
+  height: 24px;
+  font-family: 'Artifakt Element', sans-serif;
+  font-size: 11px;
+  border: 1px solid #80808088;
+}
+
+input {
+  padding: 0 8px;
+}
+
+select.month {
+  width: 134px;
+}
+
+select.date {
+  width: 48px;
+}
+
+select.large {
+  width: 100%;
+}
+
+input.time {
+  width: 70px;
+}
+
+button.export {
+  color: black;
+  background-color: white;
+  border: 1px solid #80808088;
+  padding: 0;
+  width: 100%;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+#invalidtime {
+  color: red;
+}
+
+.timeindicator {
+  height: 10px;
+  display: flex;
+  width: 212px;
+}
+
+.timeindicator .pre-line {
+  background: lightgray;
+  height: 2px;
+  width: 8px;
+  margin: 4px 0px;
+}
+
+.timeindicator .start {
+  background: black;
+  height: 10px;
+  width: 2px;
+}
+
+.timeindicator .line {
+  background: black;
+  height: 2px;
+  width: 190px;
+  margin: 4px 0px;
+}
+
+.timeindicator .end {
+  background: black;
+  height: 10px;
+  width: 2px;
+}
+
+.timeindicator .post-line {
+  background: lightgray;
+  height: 2px;
+  width: 10px;
+  margin: 4px 0px;
+}
