@@ -16,7 +16,11 @@ export default function TimeSelector(props: TimeSelectorProps) {
 
   return (
     <div class="section">
-      <select class="timepicker" value={startHour} onChange={(event) => setStartHour(parseInt(event.target.value, 10))}>
+      <select
+        class="timepicker"
+        value={startHour}
+        onChange={(event) => setStartHour(parseInt(event.currentTarget.value, 10))}
+      >
         {_.range(25).map((value) => (
           <option value={value}>{value < 10 ? "0" + value : value}</option>
         ))}
@@ -25,20 +29,28 @@ export default function TimeSelector(props: TimeSelectorProps) {
       <select
         class="timepicker"
         value={startMinute}
-        onChange={(event) => setStartMinute(parseInt(event.target.value, 10))}
+        onChange={(event) => setStartMinute(parseInt(event.currentTarget.value, 10))}
       >
         {_.range(60).map((value) => (
           <option value={value}>{value < 10 ? "0" + value : value}</option>
         ))}
       </select>
       -
-      <select class="timepicker" value={endHour} onChange={(event) => setEndHour(parseInt(event.target.value, 10))}>
+      <select
+        class="timepicker"
+        value={endHour}
+        onChange={(event) => setEndHour(parseInt(event.currentTarget.value, 10))}
+      >
         {_.range(25).map((value) => (
           <option value={value}>{value < 10 ? "0" + value : value}</option>
         ))}
       </select>
       :
-      <select class="timepicker" value={endMinute} onChange={(event) => setEndMinute(parseInt(event.target.value))}>
+      <select
+        class="timepicker"
+        value={endMinute}
+        onChange={(event) => setEndMinute(parseInt(event.currentTarget.value))}
+      >
         {_.range(60).map((value) => (
           <option value={value}>{value < 10 ? "0" + value : value}</option>
         ))}

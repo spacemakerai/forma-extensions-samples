@@ -11,7 +11,7 @@ export default function IntervalSelector(props: IntervalSelectorProps) {
         id="interval"
         class="large"
         value={interval}
-        onChange={(event) => setInterval(parseInt(event.target.value, 10))}
+        onChange={(event) => setInterval(parseInt(event.currentTarget.value, 10))}
       >
         <option value="5">Image every 5th minute</option>
         <option value="15">Image every 15th minute</option>

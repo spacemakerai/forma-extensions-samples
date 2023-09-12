@@ -30,12 +30,12 @@ export default function DateSelector(props: DateSelectorProps) {
     <div class={"section"}>
       <CalendarIcon />
       <div class="selectors">
-        <select class="month" value={month} onChange={(event) => setMonth(parseInt(event.target.value, 10))}>
+        <select class="month" value={month} onChange={(event) => setMonth(parseInt(event.currentTarget.value, 10))}>
           {MONTHS.map((name, value) => (
             <option value={value}>{name}</option>
           ))}
         </select>
-        <select class="date" value={day} onChange={(event) => setDay(parseInt(event.target.value, 10))}>
+        <select class="date" value={day} onChange={(event) => setDay(parseInt(event.currentTarget.value, 10))}>
           {_.range(1, 31).map((value) => (
             <option value={value}>{value}</option>
           ))}
