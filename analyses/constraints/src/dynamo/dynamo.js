@@ -1,4 +1,5 @@
-const dynamoUrl = "";
+const dynamoUrl = "https://app.dynaas-c-uw2.cloudos.autodesk.com/v1/graph/run";
+import code from "./script.js";
 
 async function buildInputs(config, geometry) {
   return [
@@ -7,15 +8,15 @@ async function buildInputs(config, geometry) {
       value: JSON.stringify(config),
     },*/
     {
-      nodeId: "61ac694796d9473d8c24b94c24df829f",
+      nodeId: "f3e2d30403324d74bac56b6d0e7b7473",
       value: JSON.stringify(geometry.proposal),
     },
-    {
+    /*{
       nodeId: "ed33cc713fd944319fe1d0516b764c4b",
       value: JSON.stringify(geometry.surroudings),
-    },
+    },*/
     {
-      nodeId: "57d3a29891014ef89bac997b62da466c",
+      nodeId: "ac0733e3121e4fb4a90ce1990060c4bd",
       value: JSON.stringify(geometry.constraints),
     },
   ];
@@ -23,18 +24,18 @@ async function buildInputs(config, geometry) {
 
 export async function run(config, geometry) {
   try {
-    const response = await fetch(url, {
+    const response = await fetch(dynamoUrl, {
       method: "POST",
       body: JSON.stringify({
         target: {
           type: "JsonGraphTarget",
-          contents: code,
+          contents: JSON.stringify(code),
         },
         ignoreInputs: false,
         getImage: false,
         getGeometry: false,
         getContents: false,
-        inputs: buildInputs(config, geometry),
+        inputs: await buildInputs(config, geometry),
       }),
     });
 

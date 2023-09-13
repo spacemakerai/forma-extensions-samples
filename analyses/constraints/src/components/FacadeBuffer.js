@@ -3,8 +3,8 @@ import htm from "https://esm.sh/htm";
 const html = htm.bind(h);
 
 export function FacadeBuffer({ config, setConfig }) {
-  return html`<>
-     Facade buffer
+  return html`
+    Facade buffer
     <input
       type="number"
       defaultValue="${config.facadeBuffer}"
@@ -16,5 +16,6 @@ export function FacadeBuffer({ config, setConfig }) {
         setConfig(updated);
       }}
     />
-    </>`;
+    <br />
+  `;
 }

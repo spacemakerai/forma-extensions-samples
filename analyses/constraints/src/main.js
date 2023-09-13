@@ -1,8 +1,11 @@
 import { h, render } from "https://esm.sh/preact";
-import { useState } from "https://esm.sh/preact/compat";
+import { useState, useEffect } from "https://esm.sh/preact/compat";
 import htm from "https://esm.sh/htm";
-import { useCalculateConflicts } from "./hooks/useCalculateConflicts";
-import { generateGeometry } from "./util/render";
+import { Forma } from "https://esm.sh/forma-embedded-view-sdk/auto";
+import { useCalculateConflicts } from "./hooks/useCalculateConflicts.js";
+import { generateGeometry } from "./util/render.js";
+import { FacadeMimumumDistance } from "./components/FacadeMinimumDistance.js";
+import { FacadeBuffer } from "./components/FacadeBuffer.js";
 
 // Initialize htm with Preact
 const html = htm.bind(h);
@@ -14,6 +17,7 @@ function Constraints() {
 
   useEffect(async () => {
     if (conflicts.type === "success") {
+      console.log(await generateGeometry(conflicts.data));
       await Forma.render.updateMesh({
         id: "constraint-conflicts",
         geometryData: await generateGeometry(conflicts.data),
@@ -29,9 +33,8 @@ function Constraints() {
       <h1>Constraints</h1>
       <div>
         <${FacadeMimumumDistance} config=${config} setConfig=${setConfig} />
-        <${FacadeBuffer} config${config} setConfig=${setConfig} />
+        <${FacadeBuffer} config=${config} setConfig=${setConfig} />
       </div>
-    </div>
     </div>
   `;
 }

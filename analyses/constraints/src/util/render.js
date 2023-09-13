@@ -28,6 +28,8 @@ function toNonIndexed(positions, index) {
 }
 
 export async function generateGeometry(output) {
+  console.log(output);
+
   const geometry = await new Promise((resolve) => {
     loader.load(
       "data:application/octet-stream;base64," + output.value,
