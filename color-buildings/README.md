@@ -2,7 +2,7 @@
 
 This extension is built using the **[Forma SDK for Javascript](https://aps-dev.autodesk.com/en/docs/forma/v1/reference/embedded-view-sdk/)** using an `Embedded View` in the `Right hand side analysis panel`
 
-**What it does:** Showcase basic usage of some of the SDK's APIs.
+**What it does:** Allow the user to select some buildings and change their color
 
 ### How was this built
 
