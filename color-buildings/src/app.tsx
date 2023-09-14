@@ -24,7 +24,6 @@ export function App() {
   }, []);
 
   const onClickChange = async () => {
-    Forma.render.cleanup();
     const selection = await Forma.selection.getSelection();
     for (let path of selection) {
       if (!buildings.includes(path)) {
