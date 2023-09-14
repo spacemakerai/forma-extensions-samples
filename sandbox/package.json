@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "forma-embedded-view-sdk": "^0.10.2",
+    "powerful-color-picker": "^2.6.1",
     "preact": "^10.13.1"
   },
   "devDependencies": {
