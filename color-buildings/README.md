@@ -4,7 +4,11 @@ This extension is built using the **[Forma SDK for Javascript](https://aps-dev.a
 
 **What it does:** Allow the user to select some buildings and change their color
 
-### How was this built
+## Illustration
+
+![Building colors screenshot](building-colors-screenshot.png)
+
+## How was this built
 
 The stack is build using [bun](https://bun.sh/) in a [vite](https://vitejs.dev/) + [preact](https://preactjs.com/)
 framework to enable features which are typical in a modern web developers
