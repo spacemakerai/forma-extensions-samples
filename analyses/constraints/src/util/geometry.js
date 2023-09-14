@@ -71,3 +71,20 @@ export async function getConstraints() {
     )
   ).map((a) => Array.from(a));
 }
+
+export async function getSiteLimits() {
+  const rootUrn = await Forma.proposal.getRootUrn();
+
+  const paths = await Promise.all(
+    await Forma.geometry.getPathsByCategory({
+      urn: rootUrn,
+      category: "site_limit",
+    })
+  );
+
+  const footprints = await Promise.all(
+    paths.map((path) => Forma.geometry.getFootprint({ urn: rootUrn, path }))
+  );
+
+  return footprints.map(({ coordinates }) => coordinates);
+}

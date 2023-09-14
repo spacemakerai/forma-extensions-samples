@@ -7,6 +7,8 @@ import { generateGeometry } from "./util/render.js";
 import { FacadeMimumumDistance } from "./components/FacadeMinimumDistance.js";
 import { FacadeBuffer } from "./components/FacadeBuffer.js";
 
+window.Forma = Forma;
+
 // Initialize htm with Preact
 const html = htm.bind(h);
 

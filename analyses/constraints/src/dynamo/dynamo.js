@@ -3,21 +3,25 @@ import code from "./script.js";
 
 async function buildInputs(config, geometry) {
   return [
-    /*{
-      nodeId: "tst",
-      value: JSON.stringify(config),
-    },*/
+    {
+      nodeId: "f3e2d30403324d74bac56b6d0e7b7472",
+      value: JSON.stringify(config || {}),
+    },
     {
       nodeId: "f3e2d30403324d74bac56b6d0e7b7473",
-      value: JSON.stringify(geometry.proposal),
+      value: JSON.stringify(geometry.proposal || []),
     },
-    /*{
+    {
       nodeId: "ed33cc713fd944319fe1d0516b764c4b",
-      value: JSON.stringify(geometry.surroudings),
-    },*/
+      value: JSON.stringify(geometry.surroudings || []),
+    },
+    {
+      nodeId: "ac0733e3121e4fb4a90ce1990060c4be",
+      value: JSON.stringify(geometry.siteLimits || []),
+    },
     {
       nodeId: "ac0733e3121e4fb4a90ce1990060c4bd",
-      value: JSON.stringify(geometry.constraints),
+      value: JSON.stringify(geometry.constraints || []),
     },
   ];
 }
