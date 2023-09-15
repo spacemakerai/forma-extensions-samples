@@ -33,12 +33,13 @@ export function App() {
       const a = Math.round(selectedColor.a * 255);
 
       const position = await Forma.geometry.getTriangles({ path });
-      const color = new Uint8Array((position.length / 3) * 4);
-      for (let i = 0; i < position.length / 3; i += 3) {
-        color[i * 4 + 0] = color[i * 4 + 4] = color[i * 4 + 8] = r;
-        color[i * 4 + 1] = color[i * 4 + 5] = color[i * 4 + 9] = g;
-        color[i * 4 + 2] = color[i * 4 + 6] = color[i * 4 + 10] = b;
-        color[i * 4 + 3] = color[i * 4 + 7] = color[i * 4 + 11] = a;
+      const numTriangles = position.length / 3;
+      const color = new Uint8Array(numTriangles * 4);
+      for (let i = 0; i < numTriangles; i += 1) {
+        color[i * 4 + 0] = r;
+        color[i * 4 + 1] = g;
+        color[i * 4 + 2] = b;
+        color[i * 4 + 3] = a;
       }
       const geometryData = { position, color };
       Forma.render.updateMesh({ id: path, geometryData });
