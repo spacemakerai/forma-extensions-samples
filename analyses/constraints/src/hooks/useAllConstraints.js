@@ -9,8 +9,8 @@ export function useAllConstraints() {
         { id: "constraints", filename: "ConstraintConflicts.json" },
         { id: "facade-minumum", filename: "FacadeMinimumDistance.json" },
       ].map(async ({ id, filename }) => {
-        const code = await fetch("src/rules/" + filename).then((res) =>
-          res.json()
+        const code = await fetch("src/built-in-constraints/" + filename).then(
+          (res) => res.json()
         );
 
         return {

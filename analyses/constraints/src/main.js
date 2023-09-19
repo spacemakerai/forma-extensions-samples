@@ -52,7 +52,7 @@ function Constraints() {
           marginTop: "10px",
           marginBottom: "10px",
           height: "1px",
-          width: "212px",
+          width: "228px",
           backgroundColor: "#3C3C3C10",
         }}
       />
