@@ -27,7 +27,7 @@ function toNonIndexed(positions, index) {
   return res;
 }
 
-export async function generateGeometry(output) {
+export async function generateGeometry(output, colorrgba) {
   const geometry = await new Promise((resolve) => {
     loader.load(
       "data:application/octet-stream;base64," + output.value,
@@ -46,7 +46,7 @@ export async function generateGeometry(output) {
   const position = filterPositions(positions);
   const nonIndexPositions = toNonIndexed(position, index);
   const color = Array(nonIndexPositions.length / 3)
-    .fill([255, 0, 0, 200])
+    .fill(colorrgba)
     .flat();
 
   return {

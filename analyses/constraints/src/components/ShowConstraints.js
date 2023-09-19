@@ -1,6 +1,6 @@
 import { h } from "https://esm.sh/preact";
 import htm from "https://esm.sh/htm";
-import { useState, useEffect } from "https://esm.sh/preact/hooks";
+import { useState, useEffect, useRef } from "https://esm.sh/preact/hooks";
 import { useAutomaticInputs } from "../hooks/useAutomaticInputs.js";
 import * as Dynamo from "../dynamo/dynamo.js";
 import { generateGeometry } from "../util/render.js";
@@ -16,13 +16,12 @@ const automaticInputs = [
   "Terrain",
 ];
 
-function ScriptInput({ input, state, setState }) {
+function InputField({ input, state, setState }) {
   if (input.Type === "string") {
     if (automaticInputs.includes(input.Name)) {
-      return html`<div><span>${input.Name} - automatic</span></div>`;
+      return "automatic";
     } else {
       return html`<div>
-        <span>${input.Name}</span>
         <input
           type="text"
           defaultValue=${state[input.Id]}
@@ -33,9 +32,9 @@ function ScriptInput({ input, state, setState }) {
     }
   } else if (input.Type === "number") {
     return html`<div>
-      <span>${input.Name}</span>
       <input
         type="number"
+        style=${{ width: "70px" }}
         defaultValue=${state[input.Id]}
         onChange=${(ev) =>
           setState((state) => ({
@@ -45,18 +44,25 @@ function ScriptInput({ input, state, setState }) {
       />
     </div>`;
   } else {
-    return html`<div>${input.Name} - not supported</div>`;
+    return "not supported";
   }
 }
 
 function ScriptInputs({ rule, state, setState }) {
   return rule.Inputs.map(
     (input) =>
-      html`<${ScriptInput}
-        input=${input}
-        state=${state}
-        setState=${setState}
-      />`
+      html`<div
+        style=${{
+          marginTop: "13px",
+          marginBottom: "13px",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <span>${input.Name}</span>
+        <${InputField} input=${input} state=${state} setState=${setState} />
+      </div>`
   );
 }
 
@@ -78,26 +84,48 @@ function useDefaultValues(rule) {
   return Object.fromEntries(rule.Inputs.map(({ Id, Value }) => [Id, Value]));
 }
 
-function useVisualize(runResult) {
+function useVisualize(runResult, isHovering) {
   useEffect(async () => {
     if (runResult.type === "success") {
-      const failedVisualizations = runResult.data.info.outputs.find(
+      const failedVisualizations = runResult.data?.info?.outputs?.find(
         ({ name }) => name === "FailedVisualization"
       );
 
       if (failedVisualizations?.value) {
+        const color = isHovering ? [0, 255, 0, 255] : [255, 0, 0, 200];
         await Forma.render.updateMesh({
           id: failedVisualizations.Id,
-          geometryData: await generateGeometry(failedVisualizations),
+          geometryData: await generateGeometry(failedVisualizations, color),
         });
       }
     }
-  }, [runResult]);
+  }, [runResult, isHovering]);
+}
+
+function EmojiStatus({ runResult }) {
+  if (runResult.type === "running") {
+    return html`<div style=${{ marginTop: "13px", marginBottom: "13px" }}>
+      ⏳
+    </div>`;
+  } else if (runResult.type === "error") {
+    return html`<div style=${{ marginTop: "13px", marginBottom: "13px" }}>
+      💥
+    </div>`;
+  } else if (runResult.type === "success") {
+    return html`<div style=${{ marginTop: "13px", marginBottom: "13px" }}>
+      ${runResult.data?.info?.outputs?.find(({ name }) => name === "Result")
+        ?.value
+        ? "✅"
+        : "❌"}
+    </div>`;
+  }
 }
 
 export function Constraint({ code }) {
   const [state, setState] = useState({});
+  const topDiv = useRef(null);
 
+  const [isHovering, setIsHovering] = useState(false);
   const defaultValues = useDefaultValues(code);
   const automatic = useAutomaticInputs(code);
 
@@ -107,18 +135,29 @@ export function Constraint({ code }) {
 
   const runResult = useRunScript(code, state);
 
-  useVisualize(runResult);
+  useVisualize(runResult, isHovering);
 
-  return html` <div style=${{ border: "1px solid gray" }}>
-    <span>${code.Name}</span> ${runResult.type === "running" &&
-    html`<div>⏳</div>`}
-    ${runResult.type === "success" &&
-    html`<div>
-      ${runResult.data?.info?.outputs?.find(({ name }) => name === "Result")
-        ?.value
-        ? "✅"
-        : "❌"}
-    </div>`}
+  return html` <div ref=${topDiv}>
+    <div
+      onMouseEnter=${() => setIsHovering(true)}
+      onMouseLeave=${() => setIsHovering(false)}
+      style=${{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+
+        backgroundColor: isHovering ? "#eee" : "#fff",
+      }}
+    >
+      <h2
+        onMouseEnter=${() => setIsHovering(true)}
+        onMouseLeave=${() => setIsHovering(false)}
+        style=${{ marginTop: "13px", marginBottom: "13px" }}
+      >
+        ${code.Name}
+      </h2>
+      <${EmojiStatus} runResult=${runResult} />
+    </div>
     <${ScriptInputs} rule=${code} state=${state} setState=${setState} />
   </div>`;
 }

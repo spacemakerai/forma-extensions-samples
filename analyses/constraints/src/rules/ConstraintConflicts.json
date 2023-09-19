@@ -2,7 +2,7 @@
   "Uuid": "939f7c9b-bd5e-469e-904c-5623958dcf9c",
   "IsCustomNode": false,
   "Description": "",
-  "Name": "Constraints",
+  "Name": "User Drawn Constraints",
   "ElementResolver": {
     "ResolutionMap": {
       "Point": {

@@ -46,6 +46,15 @@ function Constraints() {
         selectedConstraints=${selectedConstraints}
         toggleSelectedConstraints=${toggleSelectedConstraints}
       />`}
+      <div
+        style=${{
+          marginTop: "10px",
+          marginBottom: "10px",
+          height: "1px",
+          width: "212px",
+          backgroundColor: "#3C3C3C10",
+        }}
+      />
 
       <${ShowConstraints} constraints=${selectedConstraints} />
     </div>
