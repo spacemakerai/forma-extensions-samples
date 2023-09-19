@@ -27,6 +27,7 @@ function Constraints() {
     <div>
       <div
         style=${{
+          marginTop: "10px",
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
@@ -56,7 +57,10 @@ function Constraints() {
         }}
       />
 
-      <${ShowConstraints} constraints=${selectedConstraints} />
+      <${ShowConstraints}
+        constraints=${selectedConstraints}
+        toggleSelectedConstraints=${toggleSelectedConstraints}
+      />
     </div>
   `;
 }

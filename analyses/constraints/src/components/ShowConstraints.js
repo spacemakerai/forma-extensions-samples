@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "https://esm.sh/preact/hooks";
 import { useAutomaticInputs } from "../hooks/useAutomaticInputs.js";
 import * as Dynamo from "../dynamo/dynamo.js";
 import { generateGeometry } from "../util/render.js";
+import { Trash } from "../icons/Trash.js";
 
 // Initialize htm with Preact
 const html = htm.bind(h);
@@ -104,15 +105,11 @@ function useVisualize(runResult, isHovering) {
 
 function EmojiStatus({ runResult }) {
   if (runResult.type === "running") {
-    return html`<div style=${{ marginTop: "13px", marginBottom: "13px" }}>
-      ⏳
-    </div>`;
+    return html`<div>⏳</div>`;
   } else if (runResult.type === "error") {
-    return html`<div style=${{ marginTop: "13px", marginBottom: "13px" }}>
-      💥
-    </div>`;
+    return html`<div>💥</div>`;
   } else if (runResult.type === "success") {
-    return html`<div style=${{ marginTop: "13px", marginBottom: "13px" }}>
+    return html`<div>
       ${runResult.data?.info?.outputs?.find(({ name }) => name === "Result")
         ?.value
         ? "✅"
@@ -121,7 +118,8 @@ function EmojiStatus({ runResult }) {
   }
 }
 
-export function Constraint({ code }) {
+export function Constraint({ constraint, toggleSelectedConstraints }) {
+  const code = constraint.code;
   const [state, setState] = useState({});
   const topDiv = useRef(null);
 
@@ -156,16 +154,26 @@ export function Constraint({ code }) {
       >
         ${code.Name}
       </h2>
-      <${EmojiStatus} runResult=${runResult} />
+      <div style=${{ margin: "13px 0", display: "flex", flexDirection: "row" }}>
+        ${isHovering &&
+        html`<div style=${{ cursor: "pointer", marginRight: "5px" }}>
+          <${Trash} onClick=${() => toggleSelectedConstraints(constraint)} />
+        </div>`}
+        <${EmojiStatus} runResult=${runResult} />
+      </div>
     </div>
     <${ScriptInputs} rule=${code} state=${state} setState=${setState} />
   </div>`;
 }
 
-export function ShowConstraints({ constraints }) {
+export function ShowConstraints({ constraints, toggleSelectedConstraints }) {
   return html`<div>
     ${constraints.map(
-      (constraint) => html`<${Constraint} code=${constraint.code} />`
+      (constraint) =>
+        html`<${Constraint}
+          constraint=${constraint}
+          toggleSelectedConstraints=${toggleSelectedConstraints}
+        />`
     )}
   </div>`;
 }
