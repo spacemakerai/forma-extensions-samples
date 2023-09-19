@@ -16,21 +16,25 @@ const automaticInputs = [
   "Terrain",
 ];
 
-function RuleInput({ input, state, setState }) {
+function ScriptInput({ input, state, setState }) {
   if (input.Type === "string") {
     if (automaticInputs.includes(input.Name)) {
-      return html`<div>${input.Name} - automatic</div>`;
+      return html`<div><span>${input.Name} - automatic</span></div>`;
     } else {
-      return html`<input
-        type="text"
-        defaultValue=${state[input.Id]}
-        onChange=${(ev) =>
-          setState((state) => ({ ...state, [input.Id]: ev.target.value }))}
-      />`;
+      return html`<div>
+        <span>${input.Name}</span>
+        <input
+          type="text"
+          defaultValue=${state[input.Id]}
+          onChange=${(ev) =>
+            setState((state) => ({ ...state, [input.Id]: ev.target.value }))}
+        />
+      </div>`;
     }
   } else if (input.Type === "number") {
     return html`<div>
-      ${input.Name}<input
+      <span>${input.Name}</span>
+      <input
         type="number"
         defaultValue=${state[input.Id]}
         onChange=${(ev) =>
@@ -45,14 +49,18 @@ function RuleInput({ input, state, setState }) {
   }
 }
 
-function RuleInputs({ rule, state, setState }) {
+function ScriptInputs({ rule, state, setState }) {
   return rule.Inputs.map(
     (input) =>
-      html`<${RuleInput} input=${input} state=${state} setState=${setState} />`
+      html`<${ScriptInput}
+        input=${input}
+        state=${state}
+        setState=${setState}
+      />`
   );
 }
 
-function useRunRule(rule, state) {
+function useRunScript(rule, state) {
   const [result, setResult] = useState({ type: "init" });
   useEffect(async () => {
     setResult({ type: "running" });
@@ -77,7 +85,7 @@ function useVisualize(runResult) {
         ({ name }) => name === "FailedVisualization"
       );
 
-      if (failedVisualizations.value) {
+      if (failedVisualizations?.value) {
         await Forma.render.updateMesh({
           id: failedVisualizations.Id,
           geometryData: await generateGeometry(failedVisualizations),
@@ -87,23 +95,23 @@ function useVisualize(runResult) {
   }, [runResult]);
 }
 
-export function Rule({ rule }) {
-  const [expanded, setExpanded] = useState(false);
+export function Constraint({ code }) {
   const [state, setState] = useState({});
 
-  const defaultValues = useDefaultValues(rule);
-  const automatic = useAutomaticInputs(rule);
+  const defaultValues = useDefaultValues(code);
+  const automatic = useAutomaticInputs(code);
 
   useEffect(() => {
     setState((state) => ({ ...state, ...defaultValues, ...automatic }));
   }, [automatic]);
 
-  const runResult = useRunRule(rule, state);
+  const runResult = useRunScript(code, state);
 
   useVisualize(runResult);
 
   return html` <div style=${{ border: "1px solid gray" }}>
-    ${rule.Name} ${runResult.type === "running" && html`<div>⏳</div>`}
+    <span>${code.Name}</span> ${runResult.type === "running" &&
+    html`<div>⏳</div>`}
     ${runResult.type === "success" &&
     html`<div>
       ${runResult.data?.info?.outputs?.find(({ name }) => name === "Result")
@@ -111,9 +119,14 @@ export function Rule({ rule }) {
         ? "✅"
         : "❌"}
     </div>`}
-    <button onClick=${() => setExpanded((expanded) => !expanded)}>\\/</button>
+    <${ScriptInputs} rule=${code} state=${state} setState=${setState} />
+  </div>`;
+}
 
-    ${expanded &&
-    html`<${RuleInputs} rule=${rule} state=${state} setState=${setState} />`}
+export function ShowConstraints({ constraints }) {
+  return html`<div>
+    ${constraints.map(
+      (constraint) => html`<${Constraint} code=${constraint.code} />`
+    )}
   </div>`;
 }

@@ -3,13 +3,13 @@
 ## Choose the following inputs:
 
 Custom Forma nodes
-- Proposals (JSON as String)
+- Proposal (JSON as String)
 - SiteLimits (JSON as String)
 - Surroundings (JSON as String)
 - Constraints (JSON as String)
 - Terrain (JSON as String)
 
-Generic Dynamo Nodes
+Generic Dynamo Input Nodes
  - Number
  - String
  - Boolean

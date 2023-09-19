@@ -1,71 +1,53 @@
 import { h, render } from "https://esm.sh/preact";
-import { useState, useEffect } from "https://esm.sh/preact/compat";
+import { useState } from "https://esm.sh/preact/hooks";
 import htm from "https://esm.sh/htm";
 import { Forma } from "https://esm.sh/forma-embedded-view-sdk/auto";
-import { Rule } from "./components/Rule.js";
-import { useConstraintRules } from "./hooks/useConstraintRules.js";
+import { useSelectedConstraints } from "./hooks/useSelectedConstraints.js";
+import { useAllConstraints } from "./hooks/useAllConstraints.js";
+import { SelectConstraints } from "./components/SelectConstraints.js";
+import { ShowConstraints } from "./components/ShowConstraints.js";
+import { Cheveron } from "./icons/Cheveron.js";
 
 window.Forma = Forma;
 
 // Initialize htm with Preact
 const html = htm.bind(h);
 
-function AddConstraint({ rules, addRule }) {
-  const [selectedConstraint, setSelectedConstraint] = useState(rules[0]?.Uuid);
-
-  return html`
-    Add rules
-    <select onChange=${(e) => setSelectedConstraint(e.target.value)}>
-      ${rules.map(
-        (rule) => html`<option value=${rule.Uuid}>${rule.Name}</option>`
-      )}
-    </select>
-
-    <button
-      onClick=${() => {
-        if (selectedConstraint) {
-          const rule = rules.find((rule) => rule.Uuid === selectedConstraint);
-          addRule(rule);
-        }
-      }}
-    >
-      Add
-    </button>
-  `;
-}
-
 function Constraints() {
-  const [constraintRules, addRule, removeRule] = useConstraintRules();
-  const [rules, setRules] = useState([]);
+  const [selectedConstraints, toggleSelectedConstraints] =
+    useSelectedConstraints();
+  const allAvailableConstraints = useAllConstraints();
+  const [showAddConstraint, setShowAddConstraint] = useState(false);
 
-  useEffect(async () => {
-    const rules = await Promise.all(
-      ["ConstraintConflicts", "FacadeMinimumDistance"].map(
-        async (rule) =>
-          await fetch("src/rules/" + rule + ".json").then((res) => res.json())
-      )
-    );
-    setRules(rules);
-  }, []);
-
-  if (!rules.length) {
+  if (!allAvailableConstraints.length) {
     return html`<div>Loading...</div>`;
   }
 
   return html`
     <div>
-      <h1>Constraints</h1>
-      <div>
-        ${constraintRules.map(
-          (rule) =>
-            html`<${Rule}
-              rule=${rules.find(({ Uuid }) => Uuid === rule.ruleId)}
-              removeRule=${() => removeRule(rule.id)}
-            />`
-        )}
-      </div>
+      <div
+        style=${{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <h1 style=${{ fontWeight: "700" }}>Constraints</h1>
 
-      <${AddConstraint} rules=${rules} addRule=${addRule} />
+        <${Cheveron}
+          open=${showAddConstraint}
+          style=${{ margin: "5px" }}
+          onClick=${() => setShowAddConstraint(!showAddConstraint)}
+        />
+      </div>
+      ${showAddConstraint &&
+      html`<${SelectConstraints}
+        allAvailableConstraints=${allAvailableConstraints}
+        selectedConstraints=${selectedConstraints}
+        toggleSelectedConstraints=${toggleSelectedConstraints}
+      />`}
+
+      <${ShowConstraints} constraints=${selectedConstraints} />
     </div>
   `;
 }
