@@ -29,8 +29,6 @@ export function useAutomaticInputs(rule) {
     ({ Name }) => automaticInputs.includes(Name)
   );
 
-  console.log(rule.Inputs);
-
   const call = useCallback(async () => {
     setState(
       Object.fromEntries(
@@ -42,8 +40,6 @@ export function useAutomaticInputs(rule) {
       )
     );
   }, []);
-
-  console.log("useAutomaticInputs", { state });
 
   // Initial call
   useEffect(call, [call]);

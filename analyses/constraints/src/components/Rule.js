@@ -53,7 +53,6 @@ function RuleInputs({ rule, state, setState }) {
 }
 
 function useRunRule(rule, state) {
-  console.log({ state });
   const [result, setResult] = useState({ type: "init" });
   useEffect(async () => {
     setResult({ type: "running" });
@@ -91,10 +90,6 @@ function useVisualize(runResult) {
 export function Rule({ rule, removeRule }) {
   const [expanded, setExpanded] = useState(false);
   const [state, setState] = useState({});
-
-  console.log(rule);
-
-  console.log(state);
 
   const defaultValues = useDefaultValues(rule);
   const automatic = useAutomaticInputs(rule);
