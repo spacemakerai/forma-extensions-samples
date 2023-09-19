@@ -1,10 +1,17 @@
-import { useState, useEffect } from "https://esm.sh/preact/compat";
+import { useState, useEffect, useCallback } from "https://esm.sh/preact/compat";
+
+let storedScripts = [];
+try {
+  storedScripts = JSON.parse(
+    localStorage.getItem("dynamo-constraints") || "[]"
+  );
+} catch (e) {}
 
 export function useAllConstraints() {
-  const [allRules, setAllRules] = useState([]);
+  const [allConstraints, setAllConstraints] = useState(storedScripts);
 
   useEffect(async () => {
-    const rules = await Promise.all(
+    const builtInConstraints = await Promise.all(
       [
         { id: "constraints", filename: "ConstraintConflicts.json" },
         { id: "facade-minumum", filename: "FacadeMinimumDistance.json" },
@@ -20,7 +27,19 @@ export function useAllConstraints() {
         };
       })
     );
-    setAllRules(rules);
-  }, []);
-  return allRules;
+    setAllConstraints((constraints) => [...constraints, ...builtInConstraints]);
+  }, [setAllConstraints]);
+
+  const addConstraint = useCallback(
+    (constraint) => {
+      localStorage.setItem(
+        "dynamo-constraints",
+        JSON.stringify([...storedScripts, constraint])
+      );
+      setAllConstraints((allConstraints) => [...allConstraints, constraint]);
+    },
+    [setAllConstraints]
+  );
+
+  return [allConstraints, addConstraint];
 }

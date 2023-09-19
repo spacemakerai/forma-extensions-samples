@@ -4,7 +4,7 @@ import htm from "https://esm.sh/htm";
 import { Forma } from "https://esm.sh/forma-embedded-view-sdk/auto";
 import { useSelectedConstraints } from "./hooks/useSelectedConstraints.js";
 import { useAllConstraints } from "./hooks/useAllConstraints.js";
-import { SelectConstraints } from "./components/SelectConstraints.js";
+import { ManageConstraints } from "./components/ManageConstraints.js";
 import { ShowConstraints } from "./components/ShowConstraints.js";
 import { Cheveron } from "./icons/Cheveron.js";
 
@@ -16,7 +16,7 @@ const html = htm.bind(h);
 function Constraints() {
   const [selectedConstraints, toggleSelectedConstraints] =
     useSelectedConstraints();
-  const allAvailableConstraints = useAllConstraints();
+  const [allAvailableConstraints, addConstraint] = useAllConstraints();
   const [showAddConstraint, setShowAddConstraint] = useState(false);
 
   if (!allAvailableConstraints.length) {
@@ -42,8 +42,9 @@ function Constraints() {
         />
       </div>
       ${showAddConstraint &&
-      html`<${SelectConstraints}
+      html`<${ManageConstraints}
         allAvailableConstraints=${allAvailableConstraints}
+        addConstraint=${addConstraint}
         selectedConstraints=${selectedConstraints}
         toggleSelectedConstraints=${toggleSelectedConstraints}
       />`}
