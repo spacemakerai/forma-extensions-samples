@@ -2,41 +2,70 @@ import { h, render } from "https://esm.sh/preact";
 import { useState, useEffect } from "https://esm.sh/preact/compat";
 import htm from "https://esm.sh/htm";
 import { Forma } from "https://esm.sh/forma-embedded-view-sdk/auto";
-import { useCalculateConflicts } from "./hooks/useCalculateConflicts.js";
-import { generateGeometry } from "./util/render.js";
-import { FacadeMimumumDistance } from "./components/FacadeMinimumDistance.js";
-import { FacadeBuffer } from "./components/FacadeBuffer.js";
+import { Rule } from "./components/Rule.js";
+import { useConstraintRules } from "./hooks/useConstraintRules.js";
 
 window.Forma = Forma;
 
 // Initialize htm with Preact
 const html = htm.bind(h);
 
-function Constraints() {
-  const [config, setConfig] = useState({});
+function AddConstraint({ rules, addRule }) {
+  const [selectedConstraint, setSelectedConstraint] = useState(rules[0]?.Uuid);
 
-  const conflicts = useCalculateConflicts(config);
+  return html`
+    Add rules
+    <select onChange=${(e) => setSelectedConstraint(e.target.value)}>
+      ${rules.map(
+        (rule) => html`<option value=${rule.Uuid}>${rule.Name}</option>`
+      )}
+    </select>
+
+    <button
+      onClick=${() => {
+        if (selectedConstraint) {
+          const rule = rules.find((rule) => rule.Uuid === selectedConstraint);
+          addRule(rule);
+        }
+      }}
+    >
+      Add
+    </button>
+  `;
+}
+
+function Constraints() {
+  const [constraintRules, addRule, removeRule] = useConstraintRules();
+  const [rules, setRules] = useState([]);
 
   useEffect(async () => {
-    if (conflicts.type === "success") {
-      console.log(await generateGeometry(conflicts.data));
-      await Forma.render.updateMesh({
-        id: "constraint-conflicts",
-        geometryData: await generateGeometry(conflicts.data),
-      });
-    }
+    const rules = await Promise.all(
+      ["ConstraintConflicts", "FacadeMinimumDistance"].map(
+        async (rule) =>
+          await fetch("src/rules/" + rule + ".json").then((res) => res.json())
+      )
+    );
+    setRules(rules);
+  }, []);
 
-    return async () =>
-      await Forma.render.removeMesh({ id: "constraint-conflicts" });
-  }, [conflicts]);
+  if (!rules.length) {
+    return html`<div>Loading...</div>`;
+  }
 
   return html`
     <div>
       <h1>Constraints</h1>
       <div>
-        <${FacadeMimumumDistance} config=${config} setConfig=${setConfig} />
-        <${FacadeBuffer} config=${config} setConfig=${setConfig} />
+        ${constraintRules.map(
+          (rule) =>
+            html`<${Rule}
+              rule=${rules.find(({ Uuid }) => Uuid === rule.ruleId)}
+              removeRule=${() => removeRule(rule.id)}
+            />`
+        )}
       </div>
+
+      <${AddConstraint} rules=${rules} addRule=${addRule} />
     </div>
   `;
 }

@@ -8,25 +8,16 @@ import {
 } from "../util/geometry.js";
 import * as Dynamo from "../dynamo/dynamo.js";
 
-/*
-{ type: "initializing" }) 
-{ type: "loading" } 
-{ type: "success", data: any } 
-{ type: "failed", error: string }
-*/
-
 export function useCalculateConflicts(config) {
   const [state, setState] = useState({ type: "initializing" });
 
   const call = useCallback(async () => {
-    console.log(123);
     const geometry = {
       proposal: await getProposal(),
       surroundings: await getSurroundings(),
       constraints: await getConstraints(),
       siteLimits: await getSiteLimits(),
     };
-    console.log("done");
     try {
       setState({ type: "loading" });
       const response = await Dynamo.run(config, geometry);
