@@ -59,7 +59,8 @@ function Constraints() {
       />
 
       <${ShowConstraints}
-        constraints=${selectedConstraints}
+        selectedConstraints=${selectedConstraints}
+        allAvailableConstraints=${allAvailableConstraints}
         toggleSelectedConstraints=${toggleSelectedConstraints}
       />
     </div>

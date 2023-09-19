@@ -157,7 +157,7 @@ export function Constraint({ constraint, toggleSelectedConstraints }) {
       <div style=${{ margin: "13px 0", display: "flex", flexDirection: "row" }}>
         ${isHovering &&
         html`<div style=${{ cursor: "pointer", marginRight: "5px" }}>
-          <${Trash} onClick=${() => toggleSelectedConstraints(constraint)} />
+          <${Trash} onClick=${() => toggleSelectedConstraints(constraint.id)} />
         </div>`}
         <${EmojiStatus} runResult=${runResult} />
       </div>
@@ -166,12 +166,18 @@ export function Constraint({ constraint, toggleSelectedConstraints }) {
   </div>`;
 }
 
-export function ShowConstraints({ constraints, toggleSelectedConstraints }) {
+export function ShowConstraints({
+  selectedConstraints,
+  allAvailableConstraints,
+  toggleSelectedConstraints,
+}) {
   return html`<div>
-    ${constraints.map(
-      (constraint) =>
+    ${selectedConstraints.map(
+      (constraintId) =>
         html`<${Constraint}
-          constraint=${constraint}
+          constraint=${allAvailableConstraints.find(
+            ({ id }) => constraintId === id
+          )}
           toggleSelectedConstraints=${toggleSelectedConstraints}
         />`
     )}

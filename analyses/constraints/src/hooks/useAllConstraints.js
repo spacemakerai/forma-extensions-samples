@@ -8,7 +8,7 @@ try {
 } catch (e) {}
 
 export function useAllConstraints() {
-  const [allConstraints, setAllConstraints] = useState(storedScripts);
+  const [allConstraints, setAllConstraints] = useState([]);
 
   useEffect(async () => {
     const builtInConstraints = await Promise.all(
@@ -27,7 +27,11 @@ export function useAllConstraints() {
         };
       })
     );
-    setAllConstraints((constraints) => [...constraints, ...builtInConstraints]);
+    setAllConstraints((constraints) => [
+      ...constraints,
+      ...storedScripts,
+      ...builtInConstraints,
+    ]);
   }, [setAllConstraints]);
 
   const addConstraint = useCallback(
