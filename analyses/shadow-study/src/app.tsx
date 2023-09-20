@@ -23,6 +23,7 @@ export function App() {
       </div>
 
       <DateSelector month={month} setMonth={setMonth} day={day} setDay={setDay} />
+      <IntervalSelector interval={interval} setInterval={setInterval} />
       <TimeSelector
         startHour={startHour}
         setStartHour={setStartHour}
@@ -34,7 +35,6 @@ export function App() {
         setEndMinute={setEndMinute}
       />
       <TimeIndicator startHour={startHour} startMinute={startMinute} endHour={endHour} endMinute={endMinute} />
-      <IntervalSelector interval={interval} setInterval={setInterval} />
       <ResolutionSelector resolution={resolution} setResolution={setResolution} />
       <ExportButton
         month={month}
