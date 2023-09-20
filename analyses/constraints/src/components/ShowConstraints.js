@@ -125,8 +125,6 @@ export function Constraint({ constraint, toggleSelectedConstraints }) {
   const [state, setState] = useState({});
   const topDiv = useRef(null);
 
-  console.log({ state });
-
   const [isHovering, setIsHovering] = useState(false);
   const defaultValues = useDefaultValues(code);
   const [automatic, isInitialized] = useAutomaticInputs(code);
