@@ -1,6 +1,11 @@
 import { h } from "https://esm.sh/preact";
 import htm from "https://esm.sh/htm";
-import { useState, useEffect, useRef } from "https://esm.sh/preact/hooks";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from "https://esm.sh/preact/hooks";
 import { useAutomaticInputs } from "../hooks/useAutomaticInputs.js";
 import { Trash } from "../icons/Trash.js";
 import { useRunScript } from "../hooks/useRunScript.js";
@@ -17,10 +22,39 @@ const automaticInputs = [
   "Terrain",
 ];
 
+function AutomaticInput({ input, state }) {
+  const onMouseEnter = useCallback(async () => {
+    const positions = new Float32Array(JSON.parse(state).flat());
+
+    const l = positions.length / 3;
+
+    const color = new Uint32Array(Array(l).fill([255, 255, 0, 255]).flat());
+
+    await Forma.render.updateMesh({
+      id: input.Id,
+      geometryData: {
+        position: new Float32Array(JSON.parse(state).flat()),
+        color: color,
+      },
+    });
+  }, [input.Id, state]);
+
+  const onMouseLeave = useCallback(async () => {
+    await Forma.render.remove({ id: input.Id });
+  }, [input.Id, input]);
+
+  return html`<div onMouseEnter=${onMouseEnter} onMouseLeave=${onMouseLeave}>
+    automatic
+  </div>`;
+}
+
 function InputField({ input, state, setState }) {
   if (input.Type === "string") {
     if (automaticInputs.includes(input.Name)) {
-      return "automatic";
+      return html`<${AutomaticInput}
+        input=${input}
+        state=${state[input.Id]}
+      />`;
     } else {
       return html`<div>
         <input
@@ -90,6 +124,8 @@ export function Constraint({ constraint, toggleSelectedConstraints }) {
   const code = constraint.code;
   const [state, setState] = useState({});
   const topDiv = useRef(null);
+
+  console.log({ state });
 
   const [isHovering, setIsHovering] = useState(false);
   const defaultValues = useDefaultValues(code);
