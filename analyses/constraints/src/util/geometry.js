@@ -14,6 +14,10 @@ export async function getProposal() {
           urn: rootUrn,
           category: "generic",
         })),
+        ...(await Forma.geometry.getPathsByCategory({
+          urn: rootUrn,
+          category: null,
+        })),
       ]
         .filter((path) => path.split("/").length === 2)
         .map((path) =>
@@ -39,6 +43,10 @@ export async function getSurroundings() {
         ...(await Forma.geometry.getPathsByCategory({
           urn: rootUrn,
           category: "generic",
+        })),
+        ...(await Forma.geometry.getPathsByCategory({
+          urn: rootUrn,
+          category: null,
         })),
       ]
         .filter((path) => path.split("/").length === 3)
