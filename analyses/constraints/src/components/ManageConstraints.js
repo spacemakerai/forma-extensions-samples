@@ -21,7 +21,7 @@ export function ManageConstraints({
   toggleSelectedConstraints,
 }) {
   const downloadTempalate = useCallback(async () => {
-    const template = await fetch("src/built-in-constraints/template.json").then(
+    const template = await fetch("src/built-in-constraints/Template.json").then(
       (r) => r.text()
     );
     const save_link = document.createElement("a");
