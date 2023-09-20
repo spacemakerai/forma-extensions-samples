@@ -26,8 +26,6 @@ export function useAutomaticInputs(rule) {
   const [state, setState] = useState({});
   const [isInitialized, setInitialized] = useState(false);
 
-  console.log(rule.Name, isInitialized);
-
   const automatic = rule.Inputs.filter(({ Type }) => Type === "string").filter(
     ({ Name }) => automaticInputs.includes(Name)
   );

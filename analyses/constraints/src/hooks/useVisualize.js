@@ -21,8 +21,6 @@ export function useVisualize(runResult, isHovering) {
           await Forma.render.removeMesh({ id: failedVisualizations.Id });
         }
       }
-    } else {
-      await Forma.render.cleanup();
     }
 
     return async () => {};
