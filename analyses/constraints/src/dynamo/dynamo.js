@@ -15,7 +15,7 @@ export async function run(code, state) {
   let controller = controllers[hashId];
 
   controller.abort("aborting previous request");
-  setTimeout(() => controller.abort("timeout"), 10000);
+  setTimeout(() => controller.abort("timeout"), 30000);
   controller = new AbortController();
   const { signal } = controller;
   try {
@@ -44,7 +44,7 @@ export async function run(code, state) {
       if (signal.reason === "aborting previous request") {
         return { type: "aborted" };
       } else {
-        throw Error("Request timed out after 10 seconds");
+        throw Error("Request timed out after 30 seconds");
       }
     } else {
       throw e;
