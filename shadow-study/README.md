@@ -7,14 +7,14 @@ This extension is built using the **[Forma SDK for Javascript](https://aps-dev.a
 ### How was this built
 
 The extension was originally built as a
-[slimmed down version](https://github.com/spacemakerai/forma-extensions-samples/tree/main/analyses/shadow-study-slim)
+[slimmed down version](https://github.com/spacemakerai/forma-extensions-samples/tree/main/shadow-study-slim)
 with the bare minimum required to get it up and running. In the current version,
 it has been rewritten in a [vite](https://vitejs.dev/) +
 [preact](https://preactjs.com/) framework to enable
 [typescript](https://www.typescriptlang.org/), [React components](https://react.dev/)
 and other features which are typical in a modern web developers toolbox.
 
-We refer to the slimmed down version's [README](https://github.com/spacemakerai/forma-extensions-samples/tree/main/analyses/shadow-study-slim/readme.md) for an explanation of the core functionality of the extension.
+We refer to the slimmed down version's [README](https://github.com/spacemakerai/forma-extensions-samples/tree/main/shadow-study-slim/readme.md) for an explanation of the core functionality of the extension.
 
 ### Local testing
 
