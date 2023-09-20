@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "start": "DEV_SERVER=1 vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "file-saver": "^2.0.5",
