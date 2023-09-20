@@ -2,9 +2,9 @@ import { h } from "https://esm.sh/preact";
 import htm from "https://esm.sh/htm";
 import { useState, useEffect, useRef } from "https://esm.sh/preact/hooks";
 import { useAutomaticInputs } from "../hooks/useAutomaticInputs.js";
-import * as Dynamo from "../dynamo/dynamo.js";
-import { generateGeometry } from "../util/render.js";
 import { Trash } from "../icons/Trash.js";
+import { useRunScript } from "../hooks/useRunScript.js";
+import { useVisualize } from "../hooks/useVisualize.js";
 
 // Initialize htm with Preact
 const html = htm.bind(h);
@@ -67,47 +67,15 @@ function ScriptInputs({ rule, state, setState }) {
   );
 }
 
-function useRunScript(rule, state) {
-  const [result, setResult] = useState({ type: "init" });
-  useEffect(async () => {
-    setResult({ type: "running" });
-    try {
-      setResult({ type: "success", data: await Dynamo.run(rule, state) });
-    } catch (e) {
-      setResult({ type: "error", error: e });
-    }
-  }, [JSON.stringify(state)]);
-
-  return result;
-}
-
 function useDefaultValues(rule) {
   return Object.fromEntries(rule.Inputs.map(({ Id, Value }) => [Id, Value]));
-}
-
-function useVisualize(runResult, isHovering) {
-  useEffect(async () => {
-    if (runResult.type === "success") {
-      const failedVisualizations = runResult.data?.info?.outputs?.find(
-        ({ name }) => name === "FailedVisualization"
-      );
-
-      if (failedVisualizations?.value) {
-        const color = isHovering ? [0, 255, 0, 255] : [255, 0, 0, 200];
-        await Forma.render.updateMesh({
-          id: failedVisualizations.Id,
-          geometryData: await generateGeometry(failedVisualizations, color),
-        });
-      }
-    }
-  }, [runResult, isHovering]);
 }
 
 function EmojiStatus({ runResult }) {
   if (runResult.type === "running") {
     return html`<div>⏳</div>`;
   } else if (runResult.type === "error") {
-    return html`<div>💥</div>`;
+    return html`<div title=${runResult.error}>💥</div>`;
   } else if (runResult.type === "success") {
     return html`<div>
       ${runResult.data?.info?.outputs?.find(({ name }) => name === "Result")
