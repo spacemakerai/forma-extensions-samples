@@ -29,3 +29,15 @@ and then you just need to run
 ```shell
 yarn run dev
 ```
+
+### Contributing
+
+We welcome pull requests with suggestions for improvements from all contributors!
+
+#### Publishing changes
+
+Update the `dist` directory by building for production:
+
+```shell
+yarn build
+```
