@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { CalendarIcon } from "../assets/CalendarIcon";
 
-const MONTHS = [
+export const MONTHS = [
   "January",
   "February",
   "March",

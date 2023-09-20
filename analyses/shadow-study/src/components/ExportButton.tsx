@@ -1,6 +1,7 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { MONTHS } from "./DateSelector";
 
 type ExportButtonProps = {
   month: number;
@@ -30,7 +31,7 @@ export default function ExportButton(props: ExportButtonProps) {
       while (startDate.getTime() <= endDate.getTime()) {
         await Forma.sun.setDate({ date: startDate });
 
-        const filename = startDate.toString() + ".png";
+        const filename = startDate.toString().split("2023")[1] + ".png";
         const canvas = await Forma.camera.capture({ width, height });
         const data = canvas.toDataURL().split("base64,")[1];
         zipFolder.file(filename, data, { base64: true });
@@ -38,7 +39,11 @@ export default function ExportButton(props: ExportButtonProps) {
         startDate.setTime(startDate.getTime() + interval * 60 * 1000);
       }
 
-      zipFolder.generateAsync({ type: "blob" }).then((content) => saveAs(content, "shadow-study.zip"));
+      zipFolder
+        .generateAsync({ type: "blob" })
+        .then((content) =>
+          saveAs(content, "Shadow study - " + startDate.getDate() + " " + MONTHS[startDate.getMonth()] + ".zip"),
+        );
 
       await Forma.sun.setDate({ date: currentDate });
     } catch (e) {
