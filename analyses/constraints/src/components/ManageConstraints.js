@@ -54,7 +54,7 @@ export function ManageConstraints({
       >
         <input
           type="checkbox"
-          checked=${selectedConstraints.find((id) => constraint.id === id)}
+          checked=${!!selectedConstraints.find((id) => constraint.id === id)}
           onChange=${() => toggleSelectedConstraints(constraint.id)}
         />
         <span>${constraint.code.Name}</span>
