@@ -37,20 +37,6 @@ export function ManageConstraints({
   }, []);
 
   return html`
-    <a
-      onclick=${downloadTempalate}
-      style=${{ cursor: "pointer", color: "var(--text-active)" }}
-    >
-      Download template</a
-    >
-    <br />
-    <a
-      target="_blank"
-      href="docs/write-your-own-dynamo-script"
-      style=${{ cursor: "pointer", color: "var(--text-active)" }}
-    >
-      Learn how to build</a
-    >
     <${DropZone}
       onReceiveDrop=${(file) => {
         file.forEach(({ code }) => {
@@ -74,5 +60,46 @@ export function ManageConstraints({
         <span>${constraint.code.Name}</span>
       </div>`
     )}
+
+    <div
+      style=${{
+        border: "1px solid #3C3C3C10",
+        padding: "10px",
+        width: "206px",
+      }}
+    >
+      <img src="src/assets/dynamo-example.png" width="208" height="80" />
+
+      <div style=${{
+        margin: "10px 0",
+        color: "#3C3C3C",
+      }}>You can upload your own Dynamo script and run it as a constraint. Download our template to get
+        started or check out our documentation to learn more.
+      </div>
+
+      <div style=${{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "flex-end",
+      }}>
+        <a
+          onclick=${downloadTempalate}
+          style=${{
+            cursor: "pointer",
+            color: "var(--text-active)",
+            margin: "5px 10px",
+          }}
+        >
+          Download</a
+        >
+        <button
+          onClick=${() => () =>
+            window.open("docs/write-your-own-dynamo-script", "_blank")}
+          class="weave-passive"
+        >
+          Learn more</a
+        >
+    </button>
+    </div>
   `;
 }

@@ -101,7 +101,7 @@ export function Constraint({ constraint, toggleSelectedConstraints }) {
 
   const runResult = useRunScript(code, state, isInitialized);
 
-  useVisualize(runResult, isHovering);
+  useVisualize(constraint.id, runResult, isHovering);
 
   return html` <div ref=${topDiv}>
     <div
