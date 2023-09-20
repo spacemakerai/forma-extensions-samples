@@ -93,13 +93,13 @@ export function Constraint({ constraint, toggleSelectedConstraints }) {
 
   const [isHovering, setIsHovering] = useState(false);
   const defaultValues = useDefaultValues(code);
-  const automatic = useAutomaticInputs(code);
+  const [automatic, isInitialized] = useAutomaticInputs(code);
 
   useEffect(() => {
     setState((state) => ({ ...state, ...defaultValues, ...automatic }));
   }, [automatic]);
 
-  const runResult = useRunScript(code, state);
+  const runResult = useRunScript(code, state, isInitialized);
 
   useVisualize(runResult, isHovering);
 

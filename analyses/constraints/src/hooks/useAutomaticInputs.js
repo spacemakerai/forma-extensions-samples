@@ -24,6 +24,9 @@ const methods = {
 
 export function useAutomaticInputs(rule) {
   const [state, setState] = useState({});
+  const [isInitialized, setInitialized] = useState(false);
+
+  console.log(rule.Name, isInitialized);
 
   const automatic = rule.Inputs.filter(({ Type }) => Type === "string").filter(
     ({ Name }) => automaticInputs.includes(Name)
@@ -42,7 +45,10 @@ export function useAutomaticInputs(rule) {
   }, []);
 
   // Initial call
-  useEffect(call, [call]);
+  useEffect(async () => {
+    await call();
+    setInitialized(true);
+  }, [call]);
 
   // Call on proposal change
   useEffect(async () => {
@@ -58,5 +64,5 @@ export function useAutomaticInputs(rule) {
     return () => clearInterval(id);
   });
 
-  return state;
+  return [state, isInitialized];
 }
