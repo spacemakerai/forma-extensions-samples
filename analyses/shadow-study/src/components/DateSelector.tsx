@@ -1,20 +1,7 @@
 import _ from "lodash";
-import { CalendarIcon } from "../assets/CalendarIcon";
-
-export const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+import { Item, Row, Select, Title } from "../styles";
+import { Event } from "../utils";
+import { MONTHS } from "../utils";
 
 type DateSelectorProps = {
   month: number;
@@ -27,20 +14,29 @@ export default function DateSelector(props: DateSelectorProps) {
   const { month, setMonth, day, setDay } = props;
 
   return (
-    <div class={"section"}>
-      <CalendarIcon />
-      <div class="selectors">
-        <select class="month" value={month} onChange={(event) => setMonth(parseInt(event.currentTarget.value, 10))}>
+    <Row>
+      <Title>Date</Title>
+      <Item>
+        <Select
+          width={"80px"}
+          value={month}
+          onChange={(event: Event) => setMonth(parseInt(event.currentTarget.value, 10))}
+        >
           {MONTHS.map((name, value) => (
             <option value={value}>{name}</option>
           ))}
-        </select>
-        <select class="date" value={day} onChange={(event) => setDay(parseInt(event.currentTarget.value, 10))}>
+        </Select>
+        <Select
+          width={"40px"}
+          marginLeft={"10px"}
+          value={day}
+          onChange={(event: Event) => setDay(parseInt(event.currentTarget.value, 10))}
+        >
           {_.range(1, 31).map((value) => (
             <option value={value}>{value}</option>
           ))}
-        </select>
-      </div>
-    </div>
+        </Select>
+      </Item>
+    </Row>
   );
 }

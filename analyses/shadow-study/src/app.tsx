@@ -3,10 +3,10 @@ import DateSelector from "./components/DateSelector";
 import ExportButton from "./components/ExportButton";
 import IntervalSelector from "./components/IntervalSelector";
 import ResolutionSelector from "./components/ResolutionSelector";
-import TimeIndicator from "./components/TimeIndicator";
 import TimeSelector from "./components/TimeSelector";
+import { Header } from "./styles";
 
-export function App() {
+export default function App() {
   const [month, setMonth] = useState(6);
   const [day, setDay] = useState(15);
   const [interval, setInterval] = useState(60);
@@ -18,12 +18,8 @@ export function App() {
 
   return (
     <>
-      <div class={"section"}>
-        <h1>Shadow study</h1>
-      </div>
-
+      <Header>Shadow study</Header>
       <DateSelector month={month} setMonth={setMonth} day={day} setDay={setDay} />
-      <IntervalSelector interval={interval} setInterval={setInterval} />
       <TimeSelector
         startHour={startHour}
         setStartHour={setStartHour}
@@ -34,7 +30,7 @@ export function App() {
         endMinute={endMinute}
         setEndMinute={setEndMinute}
       />
-      <TimeIndicator startHour={startHour} startMinute={startMinute} endHour={endHour} endMinute={endMinute} />
+      <IntervalSelector interval={interval} setInterval={setInterval} />
       <ResolutionSelector resolution={resolution} setResolution={setResolution} />
       <ExportButton
         month={month}

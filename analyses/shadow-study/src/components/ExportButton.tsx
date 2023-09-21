@@ -1,7 +1,8 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
-import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import { MONTHS } from "./DateSelector";
+import JSZip from "jszip";
+import { MONTHS } from "../utils";
+import { Button } from "../styles";
 
 type ExportButtonProps = {
   month: number;
@@ -51,11 +52,5 @@ export default function ExportButton(props: ExportButtonProps) {
     }
   };
 
-  return (
-    <div class="section">
-      <button class="export" onClick={onClickExport}>
-        Export Images
-      </button>
-    </div>
-  );
+  return <Button onClick={onClickExport}>Export images</Button>;
 }
