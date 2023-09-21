@@ -10,8 +10,8 @@ export const Header = styled("h1")`
 
   height: 48px;
 
-  font-family: math;
-  font-weight: 700;
+  font-family: sans-serif;
+  font-weight: 500;
   font-size: 12px;
   line-height: 16px;
 `;
@@ -26,8 +26,8 @@ export const Row = styled("div")`
 `;
 
 export const Title = styled("div")`
-  font-family: math;
-  font-weight: 600;
+  font-family: sans-serif;
+  font-weight: 400;
   font-size: 11px;
 `;
 
@@ -46,8 +46,8 @@ export const Select = styled("select")`
   height: 24px;
   margin-left: ${(props) => props.marginLeft || "0px"};
 
-  font-family: math;
-  font-weight: 600;
+  font-family: sans-serif;
+  font-weight: 400;
   font-size: 11px;
 
   border: 1px solid #80808033;
@@ -59,8 +59,8 @@ export const HelpText = styled("div")`
 
   width: 20px;
 
-  font-family: math;
-  font-weight: 600;
+  font-family: sans-serif;
+  font-weight: 400;
   font-size: 11px;
 
   color: #3c3c3cb2;
@@ -71,8 +71,8 @@ export const Button = styled("button")`
   height: 24px;
   padding: 0;
 
-  font-family: math;
-  font-weight: 600;
+  font-family: sans-serif;
+  font-weight: 400;
   font-size: 12px;
   line-height: 16px;
 
