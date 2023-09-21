@@ -10,8 +10,10 @@ export function useRunScript(rule, state, isInitialized) {
         const { type, data } = await Dynamo.run(rule, state);
         if (type === "success") {
           setResult({ type: "success", data });
-        } else {
+        } else if (type === "aborted") {
           console.warn("request aborted");
+        } else {
+          throw new Error("unknown return type: ", type);
         }
       } catch (e) {
         console.error(e);
