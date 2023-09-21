@@ -57,10 +57,10 @@ export function useAutomaticInputs(rule) {
         rootUrn = urn;
         await call();
       }
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(id);
-  });
+  }, []);
 
   return [state, isInitialized];
 }

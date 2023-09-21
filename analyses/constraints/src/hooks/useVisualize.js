@@ -13,10 +13,12 @@ export function useVisualize(constaintId, runResult, isHovering) {
 
       if (failedVisualizations?.value) {
         const color = isHovering ? [0, 255, 0, 255] : [255, 0, 0, 200];
+        console.time("updateMesh");
         await Forma.render.updateMesh({
           id: constaintId,
           geometryData: await generateGeometry(failedVisualizations, color),
         });
+        console.timeEnd("updateMesh");
         setInScene((inScene) => [...inScene, constaintId]);
       } else {
         if (inScene.includes(constaintId)) {
