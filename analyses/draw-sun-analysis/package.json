@@ -1,0 +1,24 @@
+{
+  "name": "draw-sun-analysis",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "forma-embedded-view-sdk": "^0.11.0",
+    "lodash": "^4.17.21",
+    "preact": "^10.17.1"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.5.0",
+    "@types/file-saver": "^2.0.5",
+    "@types/lodash": "4.14.198",
+    "prettier": "3.0.3",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9"
+  }
+}
