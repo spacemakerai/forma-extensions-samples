@@ -3,6 +3,10 @@ import { useEffect, useState } from "https://esm.sh/preact/hooks";
 
 import { generateGeometry } from "../util/render.js";
 
+const colorRGB = [247, 214, 214]
+const hoverOpacity = 0.8
+const defaultOpacity = 0.5
+
 export function useVisualize(constaintId, runResult, isHovering) {
   const [inScene, setInScene] = useState([]);
   useEffect(async () => {
@@ -12,13 +16,11 @@ export function useVisualize(constaintId, runResult, isHovering) {
       );
 
       if (failedVisualizations?.value) {
-        const color = isHovering ? [0, 255, 0, 255] : [255, 0, 0, 200];
-        console.time("updateMesh");
+        const color =[...colorRGB, 255 * (isHovering ? hoverOpacity : defaultOpacity)]
         await Forma.render.updateMesh({
           id: constaintId,
           geometryData: await generateGeometry(failedVisualizations, color),
         });
-        console.timeEnd("updateMesh");
         setInScene((inScene) => [...inScene, constaintId]);
       } else {
         if (inScene.includes(constaintId)) {
