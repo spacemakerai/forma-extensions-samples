@@ -7,11 +7,15 @@ import TriggerCalculation from "./components/TriggerCalcuation";
 
 function useSunAnalysis(projectId: string) {
   const [analysis, setAnalysis] = useState<Analysis[] | undefined>();
-  const [proposalId, setProposalId] = useState<string>();
-  if (!proposalId) {
-    Forma.proposal.getId().then(setProposalId);
+  const [revisionId, setProposalId] = useState<string>();
+  if (!revisionId) {
+    Forma.proposal.getRootUrn().then((urn) => {
+      const splitUrn = urn.split(":");
+      const revisionId = splitUrn[splitUrn.length - 1];
+      setProposalId(revisionId);
+    });
   }
-  if (!analysis && proposalId) {
+  if (!analysis && revisionId) {
     Forma.analysis
       .list({
         authcontext: projectId,
@@ -20,7 +24,9 @@ function useSunAnalysis(projectId: string) {
         setAnalysis(
           analysis.filter(
             (analysis) =>
-              analysis.analysisType === "sun" && analysis.status === "SUCCEEDED" && analysis.proposalId === proposalId,
+              analysis.analysisType === "sun" &&
+              analysis.status === "SUCCEEDED" &&
+              analysis.proposalRevision === revisionId,
           ),
         );
       });
