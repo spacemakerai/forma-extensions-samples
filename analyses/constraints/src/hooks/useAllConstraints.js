@@ -45,5 +45,19 @@ export function useAllConstraints() {
     [setAllConstraints]
   );
 
-  return [allConstraints, addConstraint];
+  const removeConstraint = useCallback(
+    (constraintId) => {
+      localStorage.setItem(
+        "dynamo-constraints",
+        JSON.stringify(storedScripts.filter(({ id }) => id !== constraintId))
+      );
+
+      setAllConstraints((allConstraints) => {
+        return allConstraints.filter(({ id }) => id !== constraintId);
+      });
+    },
+    [allConstraints, setAllConstraints]
+  );
+
+  return [allConstraints, addConstraint, removeConstraint];
 }

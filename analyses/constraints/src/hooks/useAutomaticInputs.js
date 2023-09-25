@@ -57,7 +57,7 @@ export function useAutomaticInputs(rule) {
         rootUrn = urn;
         await call();
       }
-    }, 100);
+    }, 1000);
 
     return () => clearInterval(id);
   }, []);

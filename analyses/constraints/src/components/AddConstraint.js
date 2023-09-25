@@ -1,7 +1,9 @@
 import { h } from "https://esm.sh/preact";
-import { useCallback } from "https://esm.sh/preact/hooks";
+import { useCallback, useState } from "https://esm.sh/preact/hooks";
 import htm from "https://esm.sh/htm";
 import { DropZone } from "./DropZone.js";
+import { Plus } from "../icons/Plus.js";
+import { Minus } from "../icons/Minus.js";
 
 const html = htm.bind(h);
 
@@ -14,12 +16,7 @@ function makeId() {
   );
 }
 
-export function ManageConstraints({
-  allAvailableConstraints,
-  addConstraint,
-  selectedConstraints,
-  toggleSelectedConstraints,
-}) {
+function Help() {
   const downloadTempalate = useCallback(async () => {
     const template = await fetch("src/built-in-constraints/Template.json").then(
       (r) => r.text()
@@ -37,31 +34,7 @@ export function ManageConstraints({
   }, []);
 
   return html`
-    <${DropZone}
-      onReceiveDrop=${(file) => {
-        file.forEach(({ code }) => {
-          addConstraint({
-            id: makeId(),
-            Uuid: code.Uuid,
-            code,
-          });
-        });
-      }}
-    />
-    ${allAvailableConstraints.map(
-      (constraint) => html` <div
-        style=${{ marginTop: "10px", marginBottom: "10px" }}
-      >
-        <input
-          type="checkbox"
-          checked=${!!selectedConstraints.find((id) => constraint.id === id)}
-          onChange=${() => toggleSelectedConstraints(constraint.id)}
-        />
-        <span>${constraint.code.Name}</span>
-      </div>`
-    )}
-
-    <div
+  <div
       style=${{
         border: "1px solid #3C3C3C10",
         padding: "10px",
@@ -100,6 +73,37 @@ export function ManageConstraints({
           Learn more</a
         >
     </button>
+    </div>`;
+}
+
+export function AddConstraint({ addConstraint }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return html`
+    <div
+      style=${{
+        cursor: "pointer",
+        display: "flex",
+        justifyContent: "space-between",
+      }}
+      onClick=${() => setIsOpen(!isOpen)}
+    >
+      <h2>Add Dynamo script rule</h2>
+      ${isOpen ? html`<${Minus} />` : html`<${Plus} />`}
     </div>
+
+    ${isOpen &&
+    html`<${DropZone}
+        onReceiveDrop=${(file) => {
+          file.forEach(({ code }) => {
+            addConstraint({
+              id: makeId(),
+              Uuid: code.Uuid,
+              code,
+            });
+          });
+        }}
+      />
+      <${Help} />`}
   `;
 }

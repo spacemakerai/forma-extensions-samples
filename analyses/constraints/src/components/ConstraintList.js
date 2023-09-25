@@ -1,13 +1,10 @@
 import { h } from "https://esm.sh/preact";
 import htm from "https://esm.sh/htm";
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-} from "https://esm.sh/preact/hooks";
+import { useState, useEffect, useCallback } from "https://esm.sh/preact/hooks";
 import { useAutomaticInputs } from "../hooks/useAutomaticInputs.js";
 import { Trash } from "../icons/Trash.js";
+import { Plus } from "../icons/Plus.js";
+import { Minus } from "../icons/Minus.js";
 import { useRunScript } from "../hooks/useRunScript.js";
 import { useVisualize } from "../hooks/useVisualize.js";
 
@@ -21,6 +18,8 @@ const automaticInputs = [
   "Constraints",
   "Terrain",
 ];
+
+const buildInRules = ["Drawing tool", "Facade Minimum Distance"];
 
 function AutomaticInput({ input, state }) {
   const onMouseEnter = useCallback(async () => {
@@ -84,7 +83,9 @@ function InputField({ input, state, setState }) {
 }
 
 function ScriptInputs({ rule, state, setState }) {
-  return rule.Inputs.map(
+  return rule.Inputs.filter(
+    (input) => !automaticInputs.includes(input.Name)
+  ).map(
     (input) =>
       html`<div
         style=${{
@@ -120,10 +121,35 @@ function EmojiStatus({ runResult }) {
   }
 }
 
-export function Constraint({ constraint, toggleSelectedConstraints }) {
+function AddConstraint({ constraint, toggleSelectedConstraints }) {
+  return html` <div>
+    <div
+      style=${{
+        display: "flex",
+        flexDirection: "row",
+        color: "lightgray",
+        justifyContent: "space-between",
+      }}
+    >
+      <h2 style=${{ marginTop: "13px", marginBottom: "13px" }}>
+        ${constraint.code.Name}
+      </h2>
+      <div style=${{ margin: "13px 0", display: "flex", flexDirection: "row" }}>
+        <div style=${{ cursor: "pointer", marginRight: "5px" }}>
+          <${Plus} onClick=${() => toggleSelectedConstraints(constraint.id)} />
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function ActiveConstraint({
+  constraint,
+  toggleSelectedConstraints,
+  removeConstraint,
+}) {
   const code = constraint.code;
   const [state, setState] = useState({});
-  const topDiv = useRef(null);
 
   const [isHovering, setIsHovering] = useState(false);
   const defaultValues = useDefaultValues(code);
@@ -137,7 +163,9 @@ export function Constraint({ constraint, toggleSelectedConstraints }) {
 
   useVisualize(constraint.id, runResult, isHovering);
 
-  return html` <div ref=${topDiv}>
+  const isBuiltIn = buildInRules.includes(code.Name);
+
+  return html` <div>
     <div
       onMouseEnter=${() => setIsHovering(true)}
       onMouseLeave=${() => setIsHovering(false)}
@@ -157,30 +185,59 @@ export function Constraint({ constraint, toggleSelectedConstraints }) {
         ${code.Name}
       </h2>
       <div style=${{ margin: "13px 0", display: "flex", flexDirection: "row" }}>
-        ${isHovering &&
-        html`<div style=${{ cursor: "pointer", marginRight: "5px" }}>
-          <${Trash} onClick=${() => toggleSelectedConstraints(constraint.id)} />
-        </div>`}
         <${EmojiStatus} runResult=${runResult} />
+        <div style=${{ cursor: "pointer", marginRight: "5px" }}>
+          ${isBuiltIn
+            ? html`<${Minus}
+                onClick=${() => toggleSelectedConstraints(constraint.id)}
+              />`
+            : html`<${Trash}
+                onClick=${() => {
+                  toggleSelectedConstraints(constraint.id);
+                  removeConstraint(constraint.id);
+                }}
+              />`}
+        </div>
       </div>
     </div>
     <${ScriptInputs} rule=${code} state=${state} setState=${setState} />
   </div>`;
 }
 
-export function ShowConstraints({
+function Constraint({
+  constraint,
+  isActive,
+  toggleSelectedConstraints,
+  removeConstraint,
+}) {
+  if (isActive) {
+    return html`<${ActiveConstraint}
+      constraint=${constraint}
+      toggleSelectedConstraints=${toggleSelectedConstraints}
+      removeConstraint=${removeConstraint}
+    />`;
+  } else {
+    return html`<${AddConstraint}
+      constraint=${constraint}
+      toggleSelectedConstraints=${toggleSelectedConstraints}
+    />`;
+  }
+}
+
+export function ConstraintList({
   selectedConstraints,
   allAvailableConstraints,
   toggleSelectedConstraints,
+  removeConstraint,
 }) {
   return html`<div>
-    ${selectedConstraints.map(
-      (constraintId) =>
+    ${allAvailableConstraints.map(
+      (constraint) =>
         html`<${Constraint}
-          constraint=${allAvailableConstraints.find(
-            ({ id }) => constraintId === id
-          )}
+          constraint=${constraint}
+          isActive=${selectedConstraints.includes(constraint.id)}
           toggleSelectedConstraints=${toggleSelectedConstraints}
+          removeConstraint=${removeConstraint}
         />`
     )}
   </div>`;
