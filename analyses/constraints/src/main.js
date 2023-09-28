@@ -23,8 +23,8 @@ function Constraints() {
 
   return html`
     <div>
-      <div style=${{ marginTop: "10px" }}>
-        <h1 style=${{ fontWeight: "700" }}>Constraints</h1>
+      <div style=${{ height: "48px", alignItems: "center", display: "flex" }}>
+        <h1 style=${{ fontWeight: "600" }}>Constraints</h1>
       </div>
 
       <${ConstraintList}
