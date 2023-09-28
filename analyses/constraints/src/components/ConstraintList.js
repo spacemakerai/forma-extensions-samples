@@ -106,39 +106,96 @@ function useDefaultValues(rule) {
   return Object.fromEntries(rule.Inputs.map(({ Id, Value }) => [Id, Value]));
 }
 
-function EmojiStatus({ runResult }) {
-  if (runResult.type === "running") {
-    return html`<div>⏳</div>`;
+function StatusIndicator({ runResult, hover }) {
+  const circleStyle = {
+    borderRadius: "5px",
+    border: "1px solid",
+    width: "6px",
+    height: "6px",
+    margin: "4px",
+  };
+  if (!runResult) {
+    return html`<div
+      style=${{
+        ...circleStyle,
+        borderColor: hover ? "#808080" : "#9D9D9D",
+        backgroundColor: "white",
+      }}
+    />`;
+  }
+
+  if (runResult.type === "running" || runResult.type === "init") {
+    return html`<div
+      style=${{
+        ...circleStyle,
+        borderColor: "#0696D7",
+        backgroundColor: "#CDEAF7",
+        animation: "pulse 1.5s linear infinite",
+      }}
+    />`;
   } else if (runResult.type === "error") {
     return html`<div title=${runResult.error}>💥</div>`;
   } else if (runResult.type === "success") {
-    return html`<div>
-      ${runResult.data?.info?.outputs?.find(({ name }) => name === "Result")
-        ?.value
-        ? "✅"
-        : "❌"}
-    </div>`;
+    const color = runResult.data?.info?.outputs?.find(
+      ({ name }) => name === "Result"
+    )?.value
+      ? "#9FC966"
+      : "#F48686";
+    return html` <div
+      style=${{
+        ...circleStyle,
+        borderColor: color,
+        backgroundColor: color,
+      }}
+    />`;
   }
 }
 
-function AddConstraint({ constraint, toggleSelectedConstraints }) {
-  return html` <div>
+function ContraintRow({
+  name,
+  constraintId,
+  isActive,
+  runResult,
+  toggleSelectedConstraints,
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+  return html`<div
+    onMouseEnter=${() => setIsHovered(true)}
+    onMouseLeave=${() => setIsHovered(false)}
+    style=${{
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      height: "40px",
+      color: isActive || isHovered ? "black" : "#9D9D9D",
+      backgroundColor: isHovered && isActive ? "#F2F2F2" : "white",
+    }}
+  >
     <div
       style=${{
+        marginLeft: "3px",
         display: "flex",
         flexDirection: "row",
-        color: "lightgray",
-        justifyContent: "space-between",
+        justifyContent: "flex-start",
+        alignItems: "center",
       }}
     >
-      <h2 style=${{ marginTop: "13px", marginBottom: "13px" }}>
-        ${constraint.code.Name}
-      </h2>
-      <div style=${{ margin: "13px 0", display: "flex", flexDirection: "row" }}>
-        <div style=${{ cursor: "pointer", marginRight: "5px" }}>
-          <${Plus} onClick=${() => toggleSelectedConstraints(constraint.id)} />
-        </div>
-      </div>
+      <${StatusIndicator} runResult=${runResult} hover=${isHovered} />
+      <div style=${{ marginLeft: "8px", fontWeight: "500" }}>${name}</div>
+    </div>
+    <div
+      onClick=${() => toggleSelectedConstraints(constraintId)}
+      style=${{
+        cursor: "pointer",
+        backgroundColor: isHovered ? "#E7E7E7" : "white",
+        padding: "6px",
+        width: "16px",
+        height: "16px",
+        marginRight: "5px",
+      }}
+    >
+      ${isActive ? html`<${Minus} />` : html`<${Plus} }} />`}
     </div>
   </div>`;
 }
@@ -169,36 +226,14 @@ function ActiveConstraint({
     <div
       onMouseEnter=${() => setIsHovering(true)}
       onMouseLeave=${() => setIsHovering(false)}
-      style=${{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-
-        backgroundColor: isHovering ? "#eee" : "#fff",
-      }}
     >
-      <h2
-        onMouseEnter=${() => setIsHovering(true)}
-        onMouseLeave=${() => setIsHovering(false)}
-        style=${{ marginTop: "13px", marginBottom: "13px" }}
-      >
-        ${code.Name}
-      </h2>
-      <div style=${{ margin: "13px 0", display: "flex", flexDirection: "row" }}>
-        <${EmojiStatus} runResult=${runResult} />
-        <div style=${{ cursor: "pointer", marginRight: "5px" }}>
-          ${isBuiltIn
-            ? html`<${Minus}
-                onClick=${() => toggleSelectedConstraints(constraint.id)}
-              />`
-            : html`<${Trash}
-                onClick=${() => {
-                  toggleSelectedConstraints(constraint.id);
-                  removeConstraint(constraint.id);
-                }}
-              />`}
-        </div>
-      </div>
+      <${ContraintRow}
+        name=${code.Name}
+        constraintId=${constraint.id}
+        isActive=${true}
+        runResult=${runResult}
+        toggleSelectedConstraints=${toggleSelectedConstraints}
+      />
     </div>
     <${ScriptInputs} rule=${code} state=${state} setState=${setState} />
   </div>`;
@@ -217,8 +252,10 @@ function Constraint({
       removeConstraint=${removeConstraint}
     />`;
   } else {
-    return html`<${AddConstraint}
-      constraint=${constraint}
+    return html`<${ContraintRow}
+      name=${constraint.code.Name}
+      constraintId=${constraint.id}
+      isActive=${false}
       toggleSelectedConstraints=${toggleSelectedConstraints}
     />`;
   }
