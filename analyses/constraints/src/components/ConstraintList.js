@@ -112,7 +112,6 @@ function StatusIndicator({ runResult, hover }) {
     border: "1px solid",
     width: "6px",
     height: "6px",
-    margin: "4px",
   };
   if (!runResult) {
     return html`<div
@@ -169,12 +168,10 @@ function ContraintRow({
       alignItems: "center",
       height: "40px",
       color: isActive || isHovered ? "black" : "#9D9D9D",
-      backgroundColor: isHovered && isActive ? "#F2F2F2" : "white",
     }}
   >
     <div
       style=${{
-        marginLeft: "3px",
         display: "flex",
         flexDirection: "row",
         justifyContent: "flex-start",
@@ -182,7 +179,7 @@ function ContraintRow({
       }}
     >
       <${StatusIndicator} runResult=${runResult} hover=${isHovered} />
-      <div style=${{ marginLeft: "8px", fontWeight: "500" }}>${name}</div>
+      <div style=${{ marginLeft: "10px", fontWeight: "500" }}>${name}</div>
     </div>
     <div
       onClick=${() => toggleSelectedConstraints(constraintId)}
@@ -192,7 +189,6 @@ function ContraintRow({
         padding: "6px",
         width: "16px",
         height: "16px",
-        marginRight: "5px",
       }}
     >
       ${isActive ? html`<${Minus} />` : html`<${Plus} }} />`}
