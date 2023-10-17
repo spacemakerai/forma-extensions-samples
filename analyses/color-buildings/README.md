@@ -10,7 +10,7 @@ This extension is built using the **[Forma SDK for Javascript](https://aps-dev.a
 
 ## How was this built
 
-The stack is build using [bun](https://bun.sh/) in a [vite](https://vitejs.dev/) + [preact](https://preactjs.com/)
+The stack is built in a [vite](https://vitejs.dev/) + [preact](https://preactjs.com/)
 framework to enable features which are typical in a modern web developers
 toolbox.
 
@@ -21,11 +21,11 @@ In order to work with this extension locally, make sure you have the
 for Forma installed. Install dependencies using
 
 ```shell
-bun install
+yarn install
 ```
 
 and then you just need to run
 
 ```shell
-bun dev
+yarn start
 ```
