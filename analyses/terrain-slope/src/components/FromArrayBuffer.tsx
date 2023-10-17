@@ -1,7 +1,7 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { createCanvasFromSlope, degreesToRadians } from "../utils";
-import { RESOLUTION } from "../app";
+import { SCALE } from "../app";
 
 type Props = {
   steepnessThreshold: number;
@@ -40,8 +40,7 @@ export default function FromTerrainBuffer({ steepnessThreshold }: Props) {
   const calculateFromArrrayBuffer = useCallback(async () => {
     if (!metadata || !terrainSlope) return;
 
-    const { width, height, maxSlope, minSlope, maxX, minX, minY, maxY } =
-      metadata;
+    const { width, height, maxSlope, minSlope, minX, maxY } = metadata;
     const canvas = createCanvasFromSlope(
       terrainSlope,
       width,
@@ -51,16 +50,18 @@ export default function FromTerrainBuffer({ steepnessThreshold }: Props) {
       degreesToRadians(steepnessThreshold)
     );
 
+    // need to find the reference point of the terrain to place the canvas
+    // for this analysis, it's the middle of the terrain
     const position = {
-      x: ((maxX + minX) * RESOLUTION) / 2,
-      y: ((maxY + minY) * RESOLUTION) / 2,
+      x: minX + (width * SCALE) / 2,
+      y: maxY - (height * SCALE) / 2,
       z: 29,
     };
     await Forma.terrain.groundTexture.add({
       name: "terrain slope",
       canvas,
       position,
-      scale: { x: 1, y: 1 },
+      scale: { x: SCALE, y: SCALE },
     });
   }, [steepnessThreshold, terrainSlope, metadata]);
   if (!metadata || !terrainSlope) {

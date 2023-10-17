@@ -7,14 +7,13 @@ import {
 import { createCanvasFromSlope, degreesToRadians } from "../utils";
 import { useCallback } from "preact/hooks";
 import { Forma } from "forma-embedded-view-sdk/auto";
-import { CANVAS_NAME, RESOLUTION } from "../app";
+import { CANVAS_NAME, SCALE } from "../app";
 
 type Props = {
   steepnessThreshold: number;
 };
 
 function getMinMax(array: Float32Array) {
-  // return [Math.min(array)]
   return array.reduce(
     (acc, curr) => {
       acc[0] = Math.min(acc[0], curr);
@@ -75,8 +74,8 @@ export default function CalculateAndStore({ steepnessThreshold }: Props) {
     const yValues = terrainTriangles.filter((_, i) => i % 3 === 1);
     const [minY, maxY] = getMinMax(yValues);
 
-    const width = Math.floor((maxX - minX) / RESOLUTION);
-    const height = Math.floor((maxY - minY) / RESOLUTION);
+    const width = Math.floor((maxX - minX) / SCALE);
+    const height = Math.floor((maxY - minY) / SCALE);
     const direction = new THREE.Vector3(0, 0, -1);
     const origin = new THREE.Vector3(0, 0, 10000);
 
@@ -86,9 +85,9 @@ export default function CalculateAndStore({ steepnessThreshold }: Props) {
     ];
     let terrainSlope = new Float32Array(width * height).fill(NaN);
     for (let i = 0; i < height; i++) {
-      origin.y = maxY - RESOLUTION / 2 - RESOLUTION * i;
+      origin.y = maxY - SCALE / 2 - SCALE * i;
       for (let j = 0; j < width; j++) {
-        origin.x = minX + RESOLUTION / 2 + RESOLUTION * j;
+        origin.x = minX + SCALE / 2 + SCALE * j;
         raycaster.set(origin, direction);
         const intersection = raycaster.intersectObjects(scene.children)[0];
         const normal = intersection!.face!.normal;
@@ -113,17 +112,20 @@ export default function CalculateAndStore({ steepnessThreshold }: Props) {
       minSlope,
       degreesToRadians(steepnessThreshold)
     );
+
+    // need to find the reference point of the terrain to place the canvas
+    // for this analysis, it's the middle of the terrain
     const position = {
-      x: ((maxX + minX) * RESOLUTION) / 2,
-      y: ((maxY + minY) * RESOLUTION) / 2,
-      z: 29,
+      x: minX + (width * SCALE) / 2,
+      y: maxY - (height * SCALE) / 2,
+      z: 29, // need to put the texture higher up than original
     };
 
     await Forma.terrain.groundTexture.add({
       name: CANVAS_NAME,
       canvas,
       position,
-      scale: { x: 1, y: 1 },
+      scale: { x: SCALE, y: SCALE },
     });
     await Forma.extensions.storage.setObject({
       key: "terrain-steepness-png",

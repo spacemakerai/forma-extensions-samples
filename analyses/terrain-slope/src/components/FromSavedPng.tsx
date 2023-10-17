@@ -1,6 +1,6 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { useCallback, useEffect, useState } from "preact/hooks";
-import { CANVAS_NAME, RESOLUTION } from "../app";
+import { CANVAS_NAME, SCALE } from "../app";
 
 type Props = {
   steepnessThreshold: number;
@@ -76,16 +76,19 @@ export default function FromSavedPng({ steepnessThreshold }: Props) {
       console.error("png's drawing doesn't match the provided steepness");
       return;
     }
+    // need to find the reference point of the terrain to place the canvas
+    // for this analysis, it's the middle of the terrain
     const position = {
-      x: ((metadata.maxX + metadata.minX) * RESOLUTION) / 2,
-      y: ((metadata.maxY + metadata.minY) * RESOLUTION) / 2,
-      z: 29,
+      x: metadata.minX + (canvas.width * SCALE) / 2,
+      y: metadata.maxY - (canvas.height * SCALE) / 2,
+      z: 29, // need to put the texture higher up than original
     };
+
     await Forma.terrain.groundTexture.add({
       name: CANVAS_NAME,
       canvas,
       position,
-      scale: { x: 1, y: 1 },
+      scale: { x: SCALE, y: SCALE },
     });
   }, [steepnessThreshold, metadata, canvas]);
 

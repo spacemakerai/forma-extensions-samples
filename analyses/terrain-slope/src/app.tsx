@@ -12,7 +12,7 @@ const DEFAULT_SETTINGS: Settings = {
   steepnessThreshold: 25,
 };
 
-export const RESOLUTION = 1;
+export const SCALE = 1;
 
 export const CANVAS_NAME = "terrain slope";
 
