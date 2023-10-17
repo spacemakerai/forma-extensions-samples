@@ -26,9 +26,6 @@ export function App() {
   const onClickChange = async () => {
     const selection = await Forma.selection.getSelection();
     for (let path of selection) {
-      if (!buildings.includes(path)) {
-        continue;
-      }
       const { r, g, b } = selectedColor;
       const a = Math.round(selectedColor.a * 255);
 
