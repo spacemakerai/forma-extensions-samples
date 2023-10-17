@@ -1,0 +1,22 @@
+{
+  "name": "wind-surrogate-playground",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "preact": "^10.16.0",
+    "three": "^0.157.0",
+    "forma-embedded-view-sdk": "^0.16.0"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.5.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "@types/three": "^0.157.0"
+  }
+}
