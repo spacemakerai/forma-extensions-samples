@@ -15,13 +15,12 @@ const DEFAULT_SETTINGS: Settings = {
 export const RESOLUTION = 1;
 
 export const CANVAS_NAME = "terrain slope";
-// function calculateTerrainSteepness();
 
 export default function App() {
   const [projectSettings, setProjectSettings] = useState<Settings>();
 
   useEffect(() => {
-    Forma.storage.getTextItem({ key: "settings" }).then((res) => {
+    Forma.extensions.storage.getTextObject({ key: "settings" }).then((res) => {
       if (!res) {
         setProjectSettings(DEFAULT_SETTINGS);
         return;
@@ -39,7 +38,7 @@ export default function App() {
   }, []);
 
   const saveSettings = useCallback(async () => {
-    await Forma.storage.setItem({
+    await Forma.extensions.storage.setObject({
       key: "settings",
       data: JSON.stringify(projectSettings),
     });

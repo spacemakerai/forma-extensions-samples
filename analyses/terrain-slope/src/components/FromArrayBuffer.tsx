@@ -22,8 +22,8 @@ export default function FromTerrainBuffer({ steepnessThreshold }: Props) {
   const [terrainSlope, setTerrainSlope] = useState<Float32Array>();
   const [metadata, setMetadata] = useState<MetadataRaw>();
   useEffect(() => {
-    Forma.storage
-      .getBinaryItem({
+    Forma.extensions.storage
+      .getBinaryObject({
         key: "terrain-steepness-raw",
       })
       .then((res) => {

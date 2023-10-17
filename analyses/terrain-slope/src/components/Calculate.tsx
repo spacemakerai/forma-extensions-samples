@@ -118,13 +118,14 @@ export default function CalculateAndStore({ steepnessThreshold }: Props) {
       y: ((maxY + minY) * RESOLUTION) / 2,
       z: 29,
     };
+
     await Forma.terrain.groundTexture.add({
       name: CANVAS_NAME,
       canvas,
       position,
       scale: { x: 1, y: 1 },
     });
-    await Forma.storage.setItem({
+    await Forma.extensions.storage.setObject({
       key: "terrain-steepness-png",
       metadata: JSON.stringify({
         steepnessThreshold: steepnessThreshold,
@@ -135,7 +136,7 @@ export default function CalculateAndStore({ steepnessThreshold }: Props) {
       }),
       data: canvas.toDataURL(),
     });
-    await Forma.storage.setItem({
+    await Forma.extensions.storage.setObject({
       key: "terrain-steepness-raw",
       metadata: JSON.stringify({
         minSlope,

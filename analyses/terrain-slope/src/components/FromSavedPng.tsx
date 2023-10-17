@@ -49,8 +49,8 @@ export default function FromSavedPng({ steepnessThreshold }: Props) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | undefined>();
   const [metadata, setMetadata] = useState<MetadataPNG>();
   useEffect(() => {
-    Forma.storage
-      .getTextItem({
+    Forma.extensions.storage
+      .getTextObject({
         key: "terrain-steepness-png",
       })
       .then(async (res) => {
