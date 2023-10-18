@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "preact/hooks";
 import FromTerrainBuffer from "./components/FromArrayBuffer";
 import FromSavedPng from "./components/FromSavedPng";
 import CalculateAndStore from "./components/Calculate";
+import { getJSONObject, saveJSONObject } from "./services/storage";
 
 type Settings = {
   steepnessThreshold: number;
@@ -20,12 +21,12 @@ export default function App() {
   const [projectSettings, setProjectSettings] = useState<Settings>();
 
   useEffect(() => {
-    Forma.extensions.storage.getTextObject({ key: "settings" }).then((res) => {
+    getJSONObject("settings").then((res) => {
       if (!res) {
         setProjectSettings(DEFAULT_SETTINGS);
         return;
       }
-      setProjectSettings(JSON.parse(res.data) as Settings);
+      setProjectSettings(res.data);
     });
   }, []);
 
@@ -38,10 +39,7 @@ export default function App() {
   }, []);
 
   const saveSettings = useCallback(async () => {
-    await Forma.extensions.storage.setObject({
-      key: "settings",
-      data: JSON.stringify(projectSettings),
-    });
+    await saveJSONObject("settings", projectSettings);
   }, [projectSettings]);
 
   return (

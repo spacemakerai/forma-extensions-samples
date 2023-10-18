@@ -2,6 +2,7 @@ import { Forma } from "forma-embedded-view-sdk/auto";
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { createCanvasFromSlope, degreesToRadians } from "../utils";
 import { SCALE } from "../app";
+import { getFloat32Array } from "../services/storage";
 
 type Props = {
   steepnessThreshold: number;
@@ -22,19 +23,15 @@ export default function FromTerrainBuffer({ steepnessThreshold }: Props) {
   const [terrainSlope, setTerrainSlope] = useState<Float32Array>();
   const [metadata, setMetadata] = useState<MetadataRaw>();
   useEffect(() => {
-    Forma.extensions.storage
-      .getBinaryObject({
-        key: "terrain-steepness-raw",
-      })
-      .then((res) => {
-        if (!res) {
-          return;
-        }
-        setTerrainSlope(new Float32Array(res.data));
-        if (res.metadata) {
-          setMetadata(JSON.parse(res.metadata));
-        }
-      });
+    getFloat32Array("terrain-steepness-raw").then((res) => {
+      if (!res) {
+        return;
+      }
+      setTerrainSlope(res.arr);
+      if (res.metadata) {
+        setMetadata(res.metadata as MetadataRaw);
+      }
+    });
   }, []);
 
   const calculateFromArrrayBuffer = useCallback(async () => {

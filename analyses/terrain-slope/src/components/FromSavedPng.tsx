@@ -1,6 +1,7 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { CANVAS_NAME, SCALE } from "../app";
+import { getCanvasObject } from "../services/storage";
 
 type Props = {
   steepnessThreshold: number;
@@ -14,58 +15,19 @@ type MetadataPNG = {
   steepnessThreshold: number;
 };
 
-function loadImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      resolve(img);
-    };
-    img.onerror = () => {
-      reject(new Error("Failed to load image"));
-    };
-    img.src = url;
-  });
-}
-
-async function canvasFromDataUrl(url: string) {
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    throw new Error("Failed to get 2d context from canvas");
-  }
-  return await loadImage(url)
-    .then((image) => {
-      canvas.height = image.height;
-      canvas.width = image.width;
-      ctx.drawImage(image, 0, 0);
-      return canvas;
-    })
-    .catch((err) => {
-      console.error("failed to load canvas from url", err);
-    });
-}
-
 export default function FromSavedPng({ steepnessThreshold }: Props) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | undefined>();
   const [metadata, setMetadata] = useState<MetadataPNG>();
   useEffect(() => {
-    Forma.extensions.storage
-      .getTextObject({
-        key: "terrain-steepness-png",
-      })
-      .then(async (res) => {
-        if (!res) {
-          return;
-        }
-        const storedCanvas = await canvasFromDataUrl(res.data);
-        if (!storedCanvas) {
-          return;
-        }
-        setCanvas(storedCanvas);
-        if (res.metadata) {
-          setMetadata(JSON.parse(res.metadata));
-        }
-      });
+    getCanvasObject("terrain-steepness-png").then(async (res) => {
+      if (!res) {
+        return;
+      }
+      setCanvas(res.canvas);
+      if (res.metadata) {
+        setMetadata(res.metadata as MetadataPNG);
+      }
+    });
   }, []);
 
   const displayPng = useCallback(async () => {

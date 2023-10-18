@@ -8,6 +8,7 @@ import { createCanvasFromSlope, degreesToRadians } from "../utils";
 import { useCallback } from "preact/hooks";
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { CANVAS_NAME, SCALE } from "../app";
+import { saveCanvas, saveFloatArray } from "../services/storage";
 
 type Props = {
   steepnessThreshold: number;
@@ -35,13 +36,6 @@ const raycaster = new THREE.Raycaster();
 // For this analysis we only need the first hit, which is faster to compute
 // @ts-ignore
 raycaster.firstHitOnly = true;
-
-function arrayToBuffer(array: Float32Array): ArrayBuffer {
-  const buffer = new ArrayBuffer(array.length * Float32Array.BYTES_PER_ELEMENT);
-  const arr = new Float32Array(buffer);
-  arr.set(array);
-  return arr;
-}
 
 export default function CalculateAndStore({ steepnessThreshold }: Props) {
   const calculateTerrainSteepness = useCallback(async () => {
@@ -127,30 +121,22 @@ export default function CalculateAndStore({ steepnessThreshold }: Props) {
       position,
       scale: { x: SCALE, y: SCALE },
     });
-    await Forma.extensions.storage.setObject({
-      key: "terrain-steepness-png",
-      metadata: JSON.stringify({
-        steepnessThreshold: steepnessThreshold,
-        minX,
-        maxX,
-        minY,
-        maxY,
-      }),
-      data: canvas.toDataURL(),
+    await saveCanvas("terrain-steepness-png", canvas, {
+      steepnessThreshold: steepnessThreshold,
+      minX,
+      maxX,
+      minY,
+      maxY,
     });
-    await Forma.extensions.storage.setObject({
-      key: "terrain-steepness-raw",
-      metadata: JSON.stringify({
-        minSlope,
-        maxSlope,
-        width,
-        height,
-        minX,
-        maxX,
-        minY,
-        maxY,
-      }),
-      data: arrayToBuffer(terrainSlope),
+    await saveFloatArray("terrain-steepness-raw", terrainSlope, {
+      minSlope,
+      maxSlope,
+      width,
+      height,
+      minX,
+      maxX,
+      minY,
+      maxY,
     });
   }, [steepnessThreshold]);
 
