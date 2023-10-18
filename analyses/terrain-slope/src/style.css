@@ -1,0 +1,34 @@
+body {
+  font-family: "Artifakt Element", sans-serif;
+  font-size: 11px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+.section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0 0;
+}
+
+button {
+  height: 24px;
+  font-family: "Artifakt Element", sans-serif;
+  font-size: 11px;
+  border: 1px solid #80808088;
+  margin-bottom: 8px;
+}
+
+p {
+  padding: 0;
+}
+
+h2 {
+  padding: 0;
+  margin: 0;
+}
