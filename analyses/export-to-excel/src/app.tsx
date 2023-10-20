@@ -15,7 +15,7 @@ async function exportToExcel(customMetrics: MetricWithFunctionBreakdown[]) {
         }
     }
     const buffer = await wb.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "metrics.xlsx");
+    saveAs(new Blob([buffer]), "Custom_area_metrics.xlsx");
 }
 
 export function App() {
@@ -27,8 +27,9 @@ export function App() {
 
     return (
         <div>
-            <h2>Area metrics export extension</h2>
-            <button onClick={onClickExport}>Export to excel</button>
+            <h3>Export-to-excel extension</h3>
+            <div>Export your custom area metrics to excel</div>
+            <button onClick={onClickExport}>Export</button>
         </div>
     )
 }
