@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "forma-embedded-view-sdk": "^0.15.0",
     "preact": "^10.16.0"
