@@ -1,6 +1,6 @@
 # This is an Autodesk Forma sandbox extension
 
-This extension is built using the **[Forma SDK for Javascript](https://aps-dev.autodesk.com/en/docs/forma/v1/reference/embedded-view-sdk/)** using an `Embedded View` in the `Right hand side analysis panel`
+This extension is built using the **[Forma SDK for Javascript](https://aps.autodesk.com/en/docs/forma/v1/embedded-views/introduction/)** using an `Embedded View` in the `Right hand side analysis panel`
 
 **What it does:** Allow the user to select some buildings and change their color
 
@@ -17,7 +17,7 @@ toolbox.
 ### Local testing
 
 In order to work with this extension locally, make sure you have the
-[local testing extension](https://aps.autodesk.com/en/docs/forma/v1/developers_guide/local-testing-extension/)
+[local testing extension](https://aps.autodesk.com/en/docs/forma/v1/embedded-views/getting-started/)
 for Forma installed. Install dependencies using
 
 ```shell
