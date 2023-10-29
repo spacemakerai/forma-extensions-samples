@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "forma-embedded-view-sdk": "^0.18.0",
+    "forma-embedded-view-sdk": "0.20",
     "preact": "^10.13.1"
   },
   "devDependencies": {
