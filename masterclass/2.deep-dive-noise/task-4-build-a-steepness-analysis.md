@@ -93,7 +93,7 @@ const interection = raycaster.intersectObject([mesh])
 if (intersection) {
     const normal = intersection.face.normal
 
-    const slope = Math.abs(Math.PI / 2 - Math.aton(normal.z / Math.sqrt(Math.pow(normal.x, 2) + Math.pow(normal.y, 2))));
+    const slope = Math.abs(Math.PI / 2 - Math.atan(normal.z / Math.sqrt(Math.pow(normal.x, 2) + Math.pow(normal.y, 2))));
 }
 ```
 

@@ -65,8 +65,8 @@ a color scale. We use the following method to create and draw the grind onto
 a canvas with a red, yellow, green color scale. 
 
 ```js
-function createCanas(groundGrid) {
-    const {grid, width, scale} = groundGrid;
+function createCanas(groundResult) {
+    const {grid, width, scale} = groundResult;
 
     const canvas = document.createElement("canvas");
     canvas.width = groundGrid.width;
@@ -89,5 +89,6 @@ function createCanas(groundGrid) {
             ctx.fillRect(i, j, 1, 1);
         }
     }
+    return canvas;
 }
 ```

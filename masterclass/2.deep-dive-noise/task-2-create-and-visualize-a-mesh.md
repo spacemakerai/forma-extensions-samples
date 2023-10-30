@@ -1,4 +1,4 @@
-# Trigger and visualize noise results
+# Create some geometry and place it on the scene
 
 In this task you will create some simple geometry as a triangulated mesh.
 Visualize it in the scene and add it as an element to the Forma proposal.
@@ -24,7 +24,8 @@ You can now use `Forma.render.addMesh()` to preview the geometry in the scene.
 This method accepts `position`, `indices`, `normal` and `color` as flat lists, just like ThreeJS.
 Only the `position` array is mandatory. With `color` you can do vertex coloring. 
 
-Note the type of `position` is Float32Array, you can create one from a javascript array with `new Float32Array(array)`.
+Note the type of `position` is Float32Array, you can create one from a javascript array with `new Float32Array(array)`. If you use the `extrude-geometry` package then you should be able to take the `{vertices, indices}` return value an place it into the `RenderAPI` call. Now the geometry would likely show up under the terrain. To place it above we can either
+rewrite the 
 
 ## Creating an element
 

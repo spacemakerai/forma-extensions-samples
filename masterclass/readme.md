@@ -41,6 +41,6 @@ Talking about how we look at how Forma Modules / Connected Client / Sub modules 
 ## Code Session: Projects (60m)
 
  - Bring your own project, we'll help out
- - Connecting geometry generation with instant noise/wind analysis
  - Using sun and noise grids to place elements in the scene
- - Combining noise, sun and user written analses (e.g. steepness) and doing slider logic like outdoor area
+ - Connecting geometry generation with instant noise/wind analysis
+ - Combining noise, sun and user written analyses (e.g. steepness) and doing slider logic like outdoor area
