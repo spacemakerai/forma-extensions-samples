@@ -151,10 +151,10 @@ esbuild@^0.18.10:
     "@esbuild/win32-ia32" "0.18.20"
     "@esbuild/win32-x64" "0.18.20"
 
-forma-embedded-view-sdk@^0.16.0:
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/forma-embedded-view-sdk/-/forma-embedded-view-sdk-0.16.0.tgz#cac7f8d1dc1b49de64015ee16f8a3cd1b91e1489"
-  integrity sha512-dG5w2z3WnGk3nmhRMX5Snrg8Gcvz/GXC4AOnYve7emofJEwa9gGHaBAq7IW34kiWtfVTu/f4nu0WAHOPqp7uKg==
+forma-embedded-view-sdk@^0.21.1:
+  version "0.21.2"
+  resolved "https://registry.yarnpkg.com/forma-embedded-view-sdk/-/forma-embedded-view-sdk-0.21.2.tgz#e1be7c1a6596cb16f39d4a796587524c10c5afc9"
+  integrity sha512-uuIESWVAI9sqPh2y3Tzl1q+8Yf3Uq+gwq8intL+MuRf0HMFcyh4w1rjqJz1bVm3+YtUMEFRMSYI+GP63jmY2vA==
   dependencies:
     uuid "^9.0.0"
 

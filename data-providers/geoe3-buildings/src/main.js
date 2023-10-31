@@ -1,9 +1,7 @@
 import {CityJSONLoader, CityJSONParser} from "cityjson-threejs-loader";
 import {GLTFExporter} from "three/addons/exporters/GLTFExporter.js";
 import {Forma} from "forma-embedded-view-sdk/auto";
-import {BufferAttribute} from "three";
 import proj4 from "proj4";
-import {load} from "three/addons/libs/opentype.module";
 
 const parser = new CityJSONParser();
 const loader = new CityJSONLoader(parser);
@@ -74,46 +72,6 @@ export async function putInLibrary(urn, name) {
 }
 
 
-//These two functions can be used if you want to simply render data in the scene without storing it.
-//Sometimes that is useful to let the user preview data before accepting it.
-export function generateColorArray(color, vertexCount, alpha) {
-    const array = new Uint8Array(
-        alpha === undefined
-            ? [color.r * 255, color.g * 255, color.b * 255]
-            : [color.r * 255, color.g * 255, color.b * 255, alpha * 255]
-    );
-    const size = alpha === undefined ? 3 : 4;
-    const colors = new Uint8Array(vertexCount * size);
-    for (let i = 0; i < vertexCount; i++) {
-        colors.set(array, i * size);
-    }
-    return colors;
-}
-
-export function setGeometryColor(color, geo, alpha) {
-    const position = geo.getAttribute("position");
-    const colors = generateColorArray(color, position.count, alpha);
-    geo.setAttribute(
-        "color",
-        new BufferAttribute(colors, alpha === undefined ? 3 : 4, true)
-    );
-    return geo;
-}
-
-
-function getGeoLocation() {
-    // This function mocks what the SDK will soon expose.
-    // Refpoint says "where in the world is my project" expressed in a certain meter based srid
-    const refPoint = [
-        385403.8447122123,
-        6671477.6350482255
-    ]
-    const projectionString = "+proj=utm +zone=35 +datum=WGS84 +units=m +no_defs"
-    const srid = 32635
-    return {projectionString, refPoint, srid}
-}
-
-
 function transformPolygon(polygon, refPoint, oldProjectionString, newProjectionString) {
     const movedPolygon = polygon.map(p => [p[0] + refPoint[0], p[1] + refPoint[1]])
     return movedPolygon.map(p => proj4(oldProjectionString, newProjectionString, p))
@@ -157,10 +115,10 @@ async function order() {
     //Once we have the ID, we can get the actual geometry of the selected object.
     const footPrint = await Forma.geometry.getFootprint({path: selectionId})
 
-    const {projectionString, refPoint, srid} = getGeoLocation()
+    const {srid, refPoint, projString} = await Forma.project.get()
 
     //We have a polygon expressed in local coordinates. We need to 1: Add the refpoint to place it in the world, and 2: convert it to lat lon
-    const transformedFootPrint = transformPolygon(footPrint.coordinates, refPoint, projectionString, WGS84CRS)
+    const transformedFootPrint = transformPolygon(footPrint.coordinates, refPoint, projString, WGS84CRS)
 
     //This particular example buildings provider in Finland requres a bbox in this particular format.
     const bbox = polygonToBbox(transformedFootPrint)
