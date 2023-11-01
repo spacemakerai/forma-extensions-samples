@@ -1,18 +1,16 @@
 import { useState, useCallback, useEffect } from "preact/compat";
 
-import * as Dynamo from "../service/dynamo.js";
 import { DynamoOutput } from "./components/DynamoOutput.js";
 import { DynamoInput } from "./components/DynamoInput.js";
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { Back } from "../icons/Back.js";
 import dynamoIconUrn from "../icons/dynamo.png";
-import { StatusBlock } from "./components/StatusBlock.js";
 import { isSelect } from "../utils/node.js";
 import { NotTrustedGraph } from "./components/NotTrustedGraph.js";
 
 function getDefaultValues(scriptInfo: any) {
   if (scriptInfo.type === "loaded") {
-    const inputs = scriptInfo.data.inputs; // JSON.parse(code).Inputs;
+    const inputs = scriptInfo?.data?.inputs || []; // JSON.parse(code).Inputs;
     const state: any = {};
 
     for (const input of inputs) {
@@ -46,13 +44,16 @@ type ScriptResult =
   | { type: "error"; data: any }
   | { type: "loaded"; data: any };
 
-function useScript(script: any): [ScriptResult, () => void] {
+function useScript(
+  script: any,
+  dynamoHandler: any
+): [ScriptResult, () => void] {
   const [state, setState] = useState<ScriptResult>({ type: "init" });
 
   const reload = useCallback(() => {
     setState({ type: "loading" });
 
-    Dynamo.info(script.code)
+    dynamoHandler("getGraphInfo", { code: script.code })
       .then((data) => {
         setState({ type: "loaded", data });
       })
@@ -74,15 +75,29 @@ function useScript(script: any): [ScriptResult, () => void] {
 
 function AnimatedLoading() {
   const [dots, setDots] = useState(0);
+  const [slow, setSlow] = useState(false);
 
   useEffect(() => {
+    const start = new Date();
     const interval = setInterval(() => {
       setDots((dots) => (dots + 1) % 4);
+
+      if (start.getTime() + 3000 < new Date().getTime()) {
+        setSlow(true);
+      }
     }, 500);
     return () => clearInterval(interval);
   }, []);
 
-  return <div> Opening script in dynamo {Array(dots).fill(".").join("")} </div>;
+  return (
+    <div>
+      Opening script in dynamo {Array(dots).fill(".").join("")}
+      <br />
+      <br />
+      {slow &&
+        "This is taking longer than usual, check if dynamo is blocked on a saving modal."}
+    </div>
+  );
 }
 
 type Output =
@@ -91,8 +106,8 @@ type Output =
   | { type: "success"; data: any }
   | { type: "error"; data: any };
 
-export function LocalScript({ script, setPage, isAccessible }: any) {
-  const [scriptInfo, reload] = useScript(script);
+export function LocalScript({ script, setScript, dynamoHandler }: any) {
+  const [scriptInfo, reload] = useScript(script, dynamoHandler);
 
   const [state, setState] = useState<Record<string, any>>({});
 
@@ -215,7 +230,10 @@ export function LocalScript({ script, setPage, isAccessible }: any) {
         })
       );
 
-      setOutput({ type: "success", data: await Dynamo.run(code, inputs) });
+      setOutput({
+        type: "success",
+        data: await dynamoHandler("runGraph", { code, inputs }),
+      });
     } catch (e) {
       console.error(e);
       setOutput({ type: "error", data: e });
@@ -229,7 +247,7 @@ export function LocalScript({ script, setPage, isAccessible }: any) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center" }}>
-        <Back onClick={() => setPage("ScriptList")} />
+        <Back onClick={() => setScript(undefined)} />
         <h1
           onClick={() => reload()}
           style={{
@@ -245,10 +263,13 @@ export function LocalScript({ script, setPage, isAccessible }: any) {
         <img src={dynamoIconUrn} />
       </div>
 
-      <StatusBlock isAccessible={isAccessible} />
       {scriptInfo.type === "error" &&
         scriptInfo.data === "GRAPH_NOT_TRUSTED" && (
-          <NotTrustedGraph script={script} reload={reload} />
+          <NotTrustedGraph
+            script={script}
+            reload={reload}
+            dynamoHandler={dynamoHandler}
+          />
         )}
 
       {["init", "loading"].includes(scriptInfo.type) && <AnimatedLoading />}

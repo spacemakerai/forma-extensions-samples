@@ -1,11 +1,11 @@
-import { useState, useCallback, useEffect } from "preact/compat";
+import { useCallback, useEffect, useState } from "preact/compat";
 import { LocalScript } from "./pages/LocalScript";
-import * as Dynamo from "./service/dynamo";
 import { Next } from "./icons/Next";
 import dynamoIconUrn from "./icons/dynamo.png";
-import { StatusBlock } from "./pages/components/StatusBlock";
-import { TemplatesAndLibrary } from "./pages/components/TemplatesAndLibrary";
 import { Forma } from "forma-embedded-view-sdk/auto";
+import { useDynamoConnector } from "./DynamoConnector.ts";
+import { TemplatesAndLibrary } from "./pages/components/TemplatesAndLibrary.tsx";
+import { StatusBlock } from "./pages/components/StatusBlock.tsx";
 
 window.Forma = Forma;
 
@@ -16,7 +16,7 @@ try {
   console.error(e);
 }
 
-function ScriptListItem({ name, code, setScript, setPage }: any) {
+function ScriptListItem({ name, code, setScript }: any) {
   const [hover, setHover] = useState(false);
 
   return (
@@ -25,7 +25,6 @@ function ScriptListItem({ name, code, setScript, setPage }: any) {
       onMouseLeave={() => setHover(false)}
       onClick={() => {
         setScript({ name, code });
-        setPage("RunScript");
       }}
       style={{
         backgroundColor: hover ? "#80808020" : "#fff",
@@ -43,7 +42,7 @@ function ScriptListItem({ name, code, setScript, setPage }: any) {
   );
 }
 
-function ScriptList({ setScript, setPage, isAccessible }: any) {
+function ScriptList({ setScript, dynamoHandler }: any) {
   const [programs, setPrograms] = useState({});
   const [error, setError] = useState<string | null>(null);
   const [folder, setFolder] = useState(dynamoFolder);
@@ -55,8 +54,10 @@ function ScriptList({ setScript, setPage, isAccessible }: any) {
       try {
         setError(null);
         setPrograms([]);
-        const localFiles = await Dynamo.graphFolderInfo(folder);
-
+        const localFiles = await dynamoHandler("getFolderInfo", {
+          path: folder,
+        });
+        localStorage.setItem("dynamo-folder", folder);
         const localPrograms = Object.fromEntries(
           localFiles.map((file: any) => [file.name, file])
         );
@@ -67,9 +68,7 @@ function ScriptList({ setScript, setPage, isAccessible }: any) {
     })();
   }, [folder]);
 
-  useEffect(() => {
-    reload();
-  }, [reload]);
+  useEffect(reload, []);
 
   return (
     <div>
@@ -85,18 +84,17 @@ function ScriptList({ setScript, setPage, isAccessible }: any) {
           Dynamo Player
         </h1>
       </div>
-      <StatusBlock isAccessible={isAccessible} />
       <TemplatesAndLibrary />
       Folder:
       <br />
       <input
         defaultValue={folder}
-        onChange={(e: any) => {
+        onBlur={(e: any) => {
           const folder = e?.target?.value;
-          localStorage.setItem("dynamo-folder", folder);
           setFolder(folder);
         }}
       />
+      <button onClick={reload}>Load</button>
       {error && (
         <div style={{ color: "red" }}>
           {error}
@@ -111,7 +109,6 @@ function ScriptList({ setScript, setPage, isAccessible }: any) {
               name={name}
               code={code}
               setScript={setScript}
-              setPage={setPage}
             />
           ))}
         </div>
@@ -122,50 +119,24 @@ function ScriptList({ setScript, setPage, isAccessible }: any) {
   );
 }
 
-function useIsDynamoAccessible() {
-  const [state, setState] = useState({ state: "INIT" });
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      (async function () {
-        try {
-          setState({ state: await Dynamo.health() });
-        } catch (e) {
-          console.error(e);
-          setState({ state: "UNAVAILABLE" });
-        }
-      })();
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  return state;
-}
-
 export function App() {
-  const [page, setPage] = useState("ScriptList");
-  const [script, setScript] = useState({});
-
-  const isAccessible = useIsDynamoAccessible();
-
-  if (page === "ScriptList") {
+  const { dynamoState, dynamoHandler } = useDynamoConnector();
+  const [script, setScript] = useState(undefined);
+  if (dynamoState === "CONNECTED") {
     return (
-      <ScriptList
-        setPage={setPage}
-        setScript={setScript}
-        isAccessible={isAccessible}
-      />
+      <>
+        {!script && (
+          <ScriptList dynamoHandler={dynamoHandler} setScript={setScript} />
+        )}
+        {script && (
+          <LocalScript
+            dynamoHandler={dynamoHandler}
+            script={script}
+            setScript={setScript}
+          />
+        )}
+      </>
     );
-  } else if (page === "RunScript" && !!script?.code?.id) {
-    return (
-      <LocalScript
-        setPage={setPage}
-        script={script}
-        isAccessible={isAccessible}
-      />
-    );
-  } else {
-    return <div>Not found</div>;
   }
+  return <StatusBlock dynamoState={dynamoState} />;
 }

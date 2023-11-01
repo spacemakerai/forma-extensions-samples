@@ -7,21 +7,7 @@ class FetchError extends Error {
   }
 }
 
-function getDynamoUrl() {
-  let dynamoUrl = "http://localhost:55100";
-
-  try {
-    const url = localStorage.getItem("dynamo-url");
-    if (url && url.startsWith("http")) {
-      dynamoUrl = url;
-    }
-  } catch (e) {
-    console.error(e);
-  }
-  return dynamoUrl;
-}
-
-function createTarget(code: any) {
+export function createTarget(code: any) {
   if (code.id) {
     return {
       type: "PathGraphTarget",
@@ -36,47 +22,24 @@ function createTarget(code: any) {
   }
 }
 
-type Health = "READY" | "BLOCKED" | "UNAVAILABLE";
-
-export async function health(): Promise<Health> {
-  try {
-    const response = await fetch(getDynamoUrl() + "/v1/health");
-    if (response.status === 200) {
-      return "READY";
-    } else if (response.status === 503) {
-      return "BLOCKED";
-    } else {
-      return "UNAVAILABLE";
-    }
-  } catch (e) {
-    return "UNAVAILABLE";
-  }
-}
-
-export async function run(code: any, inputs: any) {
+export async function run(url: string, code: any, inputs: any) {
   const target = createTarget(code);
-
-  try {
-    const response = await fetch(getDynamoUrl() + "/v1/graph/run", {
-      method: "POST",
-      body: JSON.stringify({
-        target: target,
-        ignoreInputs: false,
-        getImage: false,
-        getGeometry: false,
-        getContents: false,
-        inputs: inputs,
-      }),
-    });
-
-    return await response.json();
-  } catch (e) {
-    console.error(e);
-  }
+  const response = await fetch(url + "/v1/graph/run", {
+    method: "POST",
+    body: JSON.stringify({
+      target: target,
+      ignoreInputs: false,
+      getImage: false,
+      getGeometry: false,
+      getContents: false,
+      inputs: inputs,
+    }),
+  });
+  return await response.json();
 }
 
-export async function graphFolderInfo(path: string) {
-  return fetch(getDynamoUrl() + "/v1/graph-folder/info", {
+export async function graphFolderInfo(url: string, path: string) {
+  return fetch(url + "/v1/graph-folder/info", {
     method: "POST",
     body: JSON.stringify({
       path: path.replaceAll(/\\/g, "\\\\"),
@@ -84,10 +47,10 @@ export async function graphFolderInfo(path: string) {
   }).then((res) => res.json());
 }
 
-export async function info(code: any) {
+export async function info(url: string, code: any) {
   const target = createTarget(code);
 
-  const response = await fetch(getDynamoUrl() + "/v1/graph/info", {
+  const response = await fetch(url + "/v1/graph/info", {
     method: "POST",
     body: JSON.stringify({
       target: target,
@@ -110,13 +73,28 @@ export async function info(code: any) {
   }
 }
 
-export async function trust(path: string) {
-  const response = await fetch(getDynamoUrl() + "/v1/settings/trusted-folder", {
+export async function trust(url: string, path: string) {
+  await fetch(url + "/v1/settings/trusted-folder", {
     method: "POST",
     body: JSON.stringify({
       path,
     }),
   });
+}
 
-  console.log(response);
+export async function health(port: number) {
+  try {
+    const response = await fetch("http://localhost:" + port + "/v1/health");
+    if (response.status === 200) {
+      return { status: 200, port };
+    }
+    // TODO: make sure 503 errors end up here
+    else if (response.status === 503) {
+      return { status: 503, port };
+    } else {
+      return { status: 500, port };
+    }
+  } catch (e) {
+    return { status: 500, port };
+  }
 }
