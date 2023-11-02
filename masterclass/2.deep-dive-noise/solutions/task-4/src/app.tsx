@@ -13,7 +13,10 @@ import {
   MeshBasicMaterial,
   Vector3,
 } from "three";
-import { useCallback } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
+import { initConsoleLogImg } from "console-log-img";
+
+initConsoleLogImg({});
 
 BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -55,11 +58,11 @@ async function runAnalysis(triangles) {
                 Math.sqrt(Math.pow(normal.x, 2) + Math.pow(normal.y, 2))
             )
         );
-        grid[i * height + j] = slope;
+        grid[i * width + j] = slope;
       }
     }
   }
-  return { grid, height, width, scale: { x: 1, y: 0 }, x0: min.x, y0: min.y };
+  return { grid, height, width, scale: { x: 1, y: 1 }, x0: min.x, y0: min.y };
 }
 
 const colors = [
@@ -83,6 +86,7 @@ function createCanvas({ grid, width, height, scale }) {
   for (let i = 0; i < grid.length; i++) {
     const x = Math.floor(i % width);
     const y = Math.floor(i / width);
+
     ctx!.fillStyle = colors[Math.floor((grid[i] / Math.PI) * colors.length)];
     ctx!.fillRect(x, y, scale.x, scale.y);
   }
@@ -105,13 +109,13 @@ export function App() {
     await Forma.terrain.groundTexture.add({
       name: "steepness",
       canvas,
-      position: {
-        x: result.x0 + result.width / 2,
-        y: result.y0 + result.height / 2,
-        z: 29,
-      },
-      scale: result.scale,
+      position: { x: 0, y: 0, z: 29 },
+      scale: { x: 1, y: 1 },
     });
+  }, []);
+
+  useEffect(() => {
+    Forma.terrain.groundTexture.remove({ name: "steepness" });
   }, []);
 
   return (
