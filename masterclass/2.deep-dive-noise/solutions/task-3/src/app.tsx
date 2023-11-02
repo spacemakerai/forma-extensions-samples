@@ -1,8 +1,8 @@
-import { Analysis } from "forma-embedded-view-sdk/analysis";
+import { Analysis, AnalysisGroundGrid } from "forma-embedded-view-sdk/analysis";
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { useCallback, useEffect, useState } from "preact/hooks";
 
-function createCanas(groundGrid) {
+function createCanas(groundGrid: AnalysisGroundGrid) {
   const { grid, width, height } = groundGrid;
 
   const canvas = document.createElement("canvas");
@@ -10,15 +10,15 @@ function createCanas(groundGrid) {
   canvas.height = height;
 
   const ctx = canvas.getContext("2d");
-  for (let k = 0; k < groundGrid.length; k++) {
+  for (let k = 0; k < grid.length; k++) {
     const i = Math.floor(k % canvas.width);
     const j = Math.floor(k / canvas.width);
 
     if (!isNaN(grid[k])) {
-      if (grid[k] < 55) {
+      if (grid[k] < 50) {
         ctx.fillStyle = "green";
-      } else if (grid[k] < 50) {
-        ctx.fillStyle = "yello";
+      } else if (grid[k] < 55) {
+        ctx.fillStyle = "yellow";
       } else {
         ctx.fillStyle = "red";
       }
@@ -61,20 +61,18 @@ export function App() {
           analysis: selectedAnalysis,
         });
 
-        console.log(groundResult);
-
         const canvas = createCanas(groundResult);
 
-        console.log(canvas);
+        const position = {
+          x: groundResult.x0 + (groundResult.width * groundResult.scale.x) / 2,
+          y: groundResult.y0 - (groundResult.height * groundResult.scale.y) / 2,
+          z: 29,
+        };
 
         await Forma.terrain.groundTexture.add({
           name: "noise-results",
           canvas: canvas,
-          position: {
-            x: groundResult.x0 - groundResult.width / 2,
-            y: groundResult.y0 - groundResult.height / 2,
-            z: 29,
-          },
+          position,
           scale: groundResult.scale,
         });
 
@@ -100,6 +98,15 @@ export function App() {
           <button onClick={showAnalysis}>Show results</button>
         </div>
       )}
+      <div>
+        <button
+          onClick={() =>
+            Forma.terrain.groundTexture.remove({ name: "noise-results" })
+          }
+        >
+          Remove result
+        </button>
+      </div>
     </div>
   );
 }
