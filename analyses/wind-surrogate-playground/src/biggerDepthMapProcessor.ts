@@ -1,6 +1,4 @@
-import { HeightMaps } from "forma-embedded-view-sdk/prediction";
 import {
-  DoubleSide,
   MeshDepthMaterial,
   OrthographicCamera,
   RGBAFormat,
@@ -9,9 +7,8 @@ import {
   WebGLRenderer,
 } from "three";
 
-const PIXEL_SIZE = 1.5; //
-const RESOLUTION = 500;
-const PIXEL_ARRAY_SIZE = RESOLUTION ** 2;
+const PIXEL_SIZE = 0.5; //
+const RESOLUTION = 4000;
 const FRUSTUM_SIZE = PIXEL_SIZE * RESOLUTION;
 const DEPTH_RENDERER = new WebGLRenderer();
 const EVEREST = 8849; // Everest
@@ -31,9 +28,8 @@ const renderPixels = (
   const orthographicCamera = new OrthographicCamera(
     -FRUSTUM_SIZE / 2,
     FRUSTUM_SIZE / 2,
-    -FRUSTUM_SIZE / 2,
     FRUSTUM_SIZE / 2,
-
+    -FRUSTUM_SIZE / 2,
     0.1,
     viewDistance
   );
@@ -41,7 +37,6 @@ const renderPixels = (
   orthographicCamera.position.set(center[0], center[1], cameraHeight);
 
   scene.overrideMaterial = new MeshDepthMaterial();
-  scene.overrideMaterial.side = DoubleSide;
   DEPTH_RENDERER.render(scene, orthographicCamera);
   const pixels = new Uint8Array(RESOLUTION * RESOLUTION * 4);
   DEPTH_RENDERER.readRenderTargetPixels(
@@ -81,13 +76,19 @@ const maximizeCameraPosition = (
   return { newCameraHeight, newViewClipPosition };
 };
 
-export async function generateDepthMap(
-  terrainScene: Scene,
+export async function biggerGenerateDepthMap(
   allScene: Scene,
   centerPosition: [number, number]
-): Promise<HeightMaps> {
-  // optimize camera position
+): Promise<{
+  data: Uint8Array;
+  min: number;
+  max: number;
+  width: number;
+  height: number;
+  resolution: number;
+}> {
   console.time("depthMapProcessor");
+  // optimize camera position
   let cameraHeight = EVEREST; // Everest
   let viewClipPosition = DEAD_SEA - (EVEREST - DEAD_SEA) / 255; // It needs to be 254 because the depth map is 8-bit
   // move maximize camera position to constant
@@ -114,12 +115,6 @@ export async function generateDepthMap(
 
   // render pixels
   const viewDistance = cameraHeight - viewClipPosition;
-  const terrainPixels = renderPixels(
-    terrainScene,
-    centerPosition,
-    cameraHeight,
-    viewDistance
-  );
   const buildingPixels = renderPixels(
     allScene,
     centerPosition,
@@ -127,19 +122,14 @@ export async function generateDepthMap(
     viewDistance
   );
 
-  const terrainData = new Uint8Array(PIXEL_ARRAY_SIZE);
-  const buildingData = new Uint8Array(PIXEL_ARRAY_SIZE);
-
-  for (let i = 0; i < terrainData.length; i++) {
-    terrainData[i] = terrainPixels[i * 4];
-    buildingData[i] = buildingPixels[i * 4];
-  }
   console.timeEnd("depthMapProcessor");
 
   return {
-    terrainHeightArray: Array.from(terrainData),
-    minHeight: viewClipPosition,
-    maxHeight: cameraHeight,
-    buildingAndTerrainHeightArray: Array.from(buildingData),
+    data: buildingPixels,
+    min: viewClipPosition,
+    max: cameraHeight,
+    width: RESOLUTION,
+    height: RESOLUTION,
+    resolution: PIXEL_SIZE,
   };
 }

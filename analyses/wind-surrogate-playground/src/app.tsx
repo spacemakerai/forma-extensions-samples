@@ -9,6 +9,16 @@ import {
   MeshBasicMaterial,
   Scene,
 } from "three";
+import { computeBoundsTree, disposeBoundsTree } from "three-mesh-bvh";
+import {
+  HeightMaps,
+  WindParametersResponse,
+} from "forma-embedded-view-sdk/predictive-analysis";
+// Speed up raycasting using https://github.com/gkjohnson/three-mesh-bvh
+// @ts-ignore
+BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
+// @ts-ignore
+BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
 
 const DEFAULT_COLOR_SCALE = [
   "#B2F8DA",
@@ -17,11 +27,15 @@ const DEFAULT_COLOR_SCALE = [
   "#FFA900",
   "#FF463A",
 ];
-const arrayMinMax = (array: Float32Array) =>
-  array.reduce(
-    ([min, max], value) => [Math.min(min, value), Math.max(max, value)],
-    [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]
-  );
+
+//const DEFAULT_COLOR_SCALE2 = [
+//  "#44ce1b",
+//  "#bbdb44",
+//  "#f7e379",
+//  "#f2a134",
+//  "#e51f1f",
+//];
+
 function drawOnCanvas(
   canvas: HTMLCanvasElement,
   {
@@ -30,7 +44,7 @@ function drawOnCanvas(
     width,
     height,
   }: {
-    grid: Float32Array;
+    grid: Float32Array | number[];
     colorScale?: string[];
     width: number;
     height: number;
@@ -40,62 +54,71 @@ function drawOnCanvas(
   const ctx = canvas.getContext("2d")!;
   canvas.height = height;
   canvas.width = width;
-  const [minValue, maxValue] = arrayMinMax(grid.filter((v) => !isNaN(v)));
 
-  for (let k = 0; k < grid.length; k++) {
-    const i = Math.floor(k % canvas.width);
-    const j = Math.floor(k / canvas.width);
+  for (let index = 0; index < grid.length; index++) {
+    const column = Math.floor(index % canvas.width);
+    const row = Math.floor(index / canvas.width);
 
-    if (!isNaN(grid[k])) {
-      const v = grid[k];
-      const scaledValue = (v - minValue) / (maxValue - minValue);
-      const colorIndex = Math.min(
-        Math.floor(scaledValue * colorScale.length),
-        colorScale.length - 1
-      );
+    if (!isNaN(grid[index])) {
+      const v = grid[index];
+      const colorIndex = Math.round(v);
       ctx.fillStyle = colorScale[colorIndex];
-      ctx.fillRect(i, j, 1, 1);
+      ctx.fillRect(column, row, 1, 1);
     }
   }
   return canvas;
 }
 
 async function calculateAndDrawWindComfort(
-  depthMap: any,
-  windRoseData: any,
+  heightMaps: HeightMaps,
+  windRoseData: WindParametersResponse,
   position: { x: number; y: number; z: number }
 ) {
-  Forma.rapidWind
-    .calculateWindComfort({
-      ...depthMap,
-      windRose: { data: windRoseData.data, height: windRoseData.height },
+  const canvas = document.createElement("canvas");
+
+  Forma.terrain.groundTexture.add({
+    name: JSON.stringify(position),
+    canvas,
+    position,
+    scale: { x: 1.5, y: 1.5 },
+  });
+  Forma.predictiveAnalysis
+    .predictWind({
+      heightMaps: heightMaps,
+      windRose: {
+        data: windRoseData.data,
+        height: windRoseData.height,
+      },
+      type: "comfort",
       roughness: windRoseData.roughness,
+      comfortScale: "lawson_lddc",
     })
     .then((data) => {
-      console.log(data);
       const canvas = document.createElement("canvas");
       drawOnCanvas(canvas, {
         grid: data.grid,
-        width: data.meta.width,
-        height: data.meta.height,
+        width: data.width,
+        height: data.height,
       });
       Forma.terrain.groundTexture.add({
-        name: JSON.stringify(position),
+        name: JSON.stringify(position) + "result",
         canvas,
         position,
-        scale: { x: data.meta.resolution, y: data.meta.resolution },
+        scale: data.scale,
       });
     });
 }
 
 export function App() {
   const [windRoseData, setWindRoseData] = useState<any | null>(null);
-  const [terrainScene, setTerrainScene] = useState<Scene | null>(null);
-  const [allScene, setAllScene] = useState<Scene | null>(null);
+  const [terrainBufferGeometry, setTerrainBufferGeometry] =
+    useState<BufferGeometry | null>(null);
+  const [allBufferGeometry, setAllBufferGeometry] =
+    useState<BufferGeometry | null>(null);
 
   useEffect(() => {
     console.log(Forma);
-    Forma.rapidWind.getWindRoseData().then((data) => {
+    Forma.predictiveAnalysis.getWindParameters().then((data) => {
       console.log(data);
       setWindRoseData(data);
     });
@@ -117,12 +140,9 @@ export function App() {
           "position",
           new BufferAttribute(terrainVertexPositions, 3)
         );
-        const terrainScene = new Scene();
-
-        terrainScene.add(
-          new Mesh(terrainGeometry, new MeshBasicMaterial({ color: 0xff0000 }))
-        );
-        setTerrainScene(terrainScene);
+        // @ts-ignore
+        terrainGeometry.computeBoundsTree();
+        setTerrainBufferGeometry(terrainGeometry);
       });
   }, []);
 
@@ -137,19 +157,31 @@ export function App() {
           "position",
           new BufferAttribute(terrainVertexPositions, 3)
         );
-        const allScene = new Scene();
-
-        allScene.add(
-          new Mesh(allGeometry, new MeshBasicMaterial({ color: 0xff0000 }))
-        );
-        setAllScene(allScene);
+        // @ts-ignore
+        allGeometry.computeBoundsTree();
+        setAllBufferGeometry(allGeometry);
       });
   }, []);
 
   useEffect(() => {
-    if (windRoseData && allScene && terrainScene) {
-      for (let x = 0; x <= 200; x += 200) {
-        for (let y = 0; y <= 200; y += 200) {
+    if (windRoseData && allBufferGeometry && terrainBufferGeometry) {
+      const allScene = new Scene();
+
+      allScene.add(
+        new Mesh(allBufferGeometry, new MeshBasicMaterial({ color: 0xff0000 }))
+      );
+
+      const terrainScene = new Scene();
+
+      terrainScene.add(
+        new Mesh(
+          terrainBufferGeometry,
+          new MeshBasicMaterial({ color: 0xff0000 })
+        )
+      );
+
+      for (let x = 0; x <= 500; x += 200) {
+        for (let y = 0; y <= 500; y += 200) {
           generateDepthMap(terrainScene, allScene, [x, y]).then((depthMap) => {
             calculateAndDrawWindComfort(depthMap, windRoseData, {
               x,

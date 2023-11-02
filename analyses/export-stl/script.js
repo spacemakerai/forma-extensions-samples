@@ -2,6 +2,8 @@ import { Forma } from "https://esm.sh/forma-embedded-view-sdk/auto";
 import * as THREE from "three";
 import { STLExporter } from "three/addons/exporters/STLExporter.js";
 
+console.log(await Forma.areaMetrics.calculate({ paths: ["root"] }));
+
 document.getElementById("run").onclick = async () => {
   try {
     const triangles = await Forma.geometry.getTriangles({ path: "root" });
