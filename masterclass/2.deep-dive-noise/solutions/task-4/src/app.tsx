@@ -14,9 +14,6 @@ import {
   Vector3,
 } from "three";
 import { useCallback, useEffect } from "preact/hooks";
-import { initConsoleLogImg } from "console-log-img";
-
-initConsoleLogImg({});
 
 BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
