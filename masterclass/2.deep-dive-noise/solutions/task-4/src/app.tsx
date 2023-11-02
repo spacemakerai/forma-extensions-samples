@@ -13,7 +13,7 @@ import {
   MeshBasicMaterial,
   Vector3,
 } from "three";
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback } from "preact/hooks";
 
 BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -24,6 +24,8 @@ const raycaster = new Raycaster();
 async function runAnalysis(triangles) {
   const geometry = new BufferGeometry();
   geometry.setAttribute("position", new BufferAttribute(triangles, 3));
+
+  geometry.computeBoundsTree();
   const mesh = new Mesh(geometry, new MeshBasicMaterial());
 
   const { min, max } = await Forma.terrain.getBbox();
@@ -40,14 +42,11 @@ async function runAnalysis(triangles) {
       const position = new Vector3(x, y, max.z + 1);
       const direction = new Vector3(0, 0, -1);
 
-      const intersection = raycaster.intersectObject(
-        [mesh],
-        position,
-        direction
-      );
+      raycaster.set(position, direction);
+      const intersections = raycaster.intersectObject(mesh);
 
-      if (intersection) {
-        const { normal } = intersection.face;
+      if (intersections && intersections.length) {
+        const { normal } = intersections[0].face;
 
         const slope = Math.abs(
           Math.PI / 2 -

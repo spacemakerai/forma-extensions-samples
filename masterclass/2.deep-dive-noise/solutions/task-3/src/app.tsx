@@ -35,10 +35,17 @@ export function App() {
   >(undefined);
 
   useEffect(() => {
-    Forma.analysis
-      .list({ analysisTypes: ["noise"] })
-      .then((analyses) => setAnalyses(analyses));
+    Forma.analysis.list({ analysisTypes: ["noise"] }).then((analyses) => {
+      setAnalyses(analyses);
+      if (analyses.length) {
+        setSelectedAnalysis(analyses[0]);
+      }
+    });
   }, []);
+
+  useEffect(() => {
+    console.log(selectedAnalysis);
+  }, [selectedAnalysis]);
 
   const selectAnalysis = useCallback((e) => {
     const id = e.target.data["id"];
@@ -49,22 +56,32 @@ export function App() {
 
   const showAnalysis = useCallback(() => {
     (async function () {
-      const groundResult = await Forma.analysis.getGroundGrid({
-        analysis: selectedAnalysis,
-      });
+      try {
+        const groundResult = await Forma.analysis.getGroundGrid({
+          analysis: selectedAnalysis,
+        });
 
-      const canvas = createCanas(groundResult);
+        console.log(groundResult);
 
-      await Forma.terrain.groundTexture.add({
-        name: "noise-results",
-        canvas: canvas,
-        position: {
-          x: groundResult.x0 - groundResult.width / 2,
-          y: groundResult.y0 - groundResult.height / 2,
-          z: 29,
-        },
-        scale: groundResult.scale,
-      });
+        const canvas = createCanas(groundResult);
+
+        console.log(canvas);
+
+        await Forma.terrain.groundTexture.add({
+          name: "noise-results",
+          canvas: canvas,
+          position: {
+            x: groundResult.x0 - groundResult.width / 2,
+            y: groundResult.y0 - groundResult.height / 2,
+            z: 29,
+          },
+          scale: groundResult.scale,
+        });
+
+        console.log("drawn");
+      } catch (e) {
+        console.error(e);
+      }
     })();
   }, [selectedAnalysis]);
 

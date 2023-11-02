@@ -894,6 +894,11 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
+earcut@^2.1.3:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/earcut/-/earcut-2.2.4.tgz#6d02fd4d68160c114825d06890a92ecaae60343a"
+  integrity sha512-/pjZsA1b4RPHbeWZQn66SWS8nZZWLQQ23oE3Eam7aroEFGEvwKAsJfZ9ytiEMycfzXWpca4FA9QIOehf7PocBQ==
+
 electron-to-chromium@^1.4.535:
   version "1.4.569"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.569.tgz#1298b67727187ffbaac005a7425490d157f3ad03"
@@ -1324,6 +1329,13 @@ gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
   resolved "https://registry.yarnpkg.com/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
   integrity sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==
+
+geometry-extrude@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/geometry-extrude/-/geometry-extrude-0.2.1.tgz#e4b9001a3dc90e3b488d5361faedb2e3265e4827"
+  integrity sha512-mvOzSYpQE7oleGZnqAGK57Lstzbr4f65wa3eGpX5osP9ZCuvPBcte7SVhZ39Ubdfwj75kAXLjbyMBK2bV3ngTQ==
+  dependencies:
+    earcut "^2.1.3"
 
 get-intrinsic@^1.0.2, get-intrinsic@^1.1.1, get-intrinsic@^1.1.3, get-intrinsic@^1.2.0, get-intrinsic@^1.2.1, get-intrinsic@^1.2.2:
   version "1.2.2"

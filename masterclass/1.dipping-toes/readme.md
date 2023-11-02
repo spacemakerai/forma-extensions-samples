@@ -44,13 +44,15 @@ scene while clicking the button.
 Use the current selection to call the `Forma.areaMetrics.calculate` method. 
 You can console.log this and play around with the selection. 
 
+Note: the selection for metrics is currently limited to ground polygons like site_limit.
+
 ## Export these metrics to excel
 
 add these imports:
 
 ```js
 import ExcelJS from "https://esm.sh/exceljs";
-import { saveAs } from "https://esm.sh/file-saver";
+import saveAs from "https://esm.sh/file-saver";
 ```
 
 You should now be able to export your metrics with the following helper function: 

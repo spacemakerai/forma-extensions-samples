@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "forma-embedded-view-sdk": "0.20",
+    "geometry-extrude": "^0.2.1",
     "preact": "^10.13.1"
   },
   "devDependencies": {

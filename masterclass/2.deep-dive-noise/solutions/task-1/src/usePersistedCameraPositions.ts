@@ -1,7 +1,7 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { StateUpdater, useCallback, useEffect, useState } from "preact/hooks";
 
-/* Bonus task */ 
+/* Bonus task */
 
 type CameraPosition = {
   position: { x: number; y: number; z: number };
@@ -24,16 +24,15 @@ export function usePersistedCameraPositions(): [
   });
 
   const setPersistedCameraPositions = useCallback(
-    (updater: (CameraPosition[]) => CameraPosition[]) => 
-      async () => {
-        const newPositions = updater(cameraPositions);
-        await Forma.extensions.storage.setObject({
-          key: "camera-positions",
-          data: JSON.stringify(newPositions),
-        });
+    (updater) => async () => {
+      const newPositions = updater(cameraPositions);
+      await Forma.extensions.storage.setObject({
+        key: "camera-positions",
+        data: JSON.stringify(newPositions),
+      });
 
-        setCameraPositions(newPositions);
-      },
+      setCameraPositions(newPositions);
+    },
     [cameraPositions]
   );
 

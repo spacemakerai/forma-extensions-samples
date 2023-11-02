@@ -1,47 +1,70 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
+import { extrudePolygon } from "geometry-extrude";
+import { useCallback } from "preact/hooks";
 
-async function findMinOnTerrainZ(polygon: [number, number][]) {
-  const zOffset = await Forma.terrain.elevationAt(...polygon[0])
-  for (const i=1, i<polygon.length; i++) {
-    const [x, y] = poylgon[i]
-    const z = await Forma.terrain.elevationAt(x, y)
-    zOffset = Math.min(z, zOffset)
+function findMinOnTerrainZ(polygon: [number, number][]) {
+  return 20;
+
+  /*let zOffset = await Forma.terrain.elevationAt(...polygon[0]);
+  for (let i = 1; i < polygon.length; i++) {
+    const [x, y] = polygon[i];
+    const z = await Forma.terrain.elevationAt(x, y);
+    zOffset = Math.min(z, zOffset);
   }
-  return zOffset
+  return zOffset;*/
 }
 
-function makeTranslateZMatrix(zOffset) {
-  return [
-    1, 0, 0, 0,
-    0, 1, 0, 0, 
-    0, 0, 1, 0, 
-    0, 0, 0, 1
-  ]
+function makeTranslateZMatrix(
+  zOffset
+): [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+] {
+  return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
 
-function async generateGeometry(polygon) {
-  const { vertices, indices } = extrudePolygon(polygon);
-  const zOffset = await findMinOnTerrainZ(polygon)
-  const transform = makeTranslateZMatrix(zOffset)
+async function generateGeometry(polygon) {
+  const { position, indices } = extrudePolygon([polygon], { depth: 10 });
+  const zOffset = findMinOnTerrainZ(polygon);
+  const transform = makeTranslateZMatrix(zOffset);
 
-  return { vertices, indices, transform }
+  return { position, indices, transform };
 }
+
+const { position, indices, transform } = await generateGeometry([
+  [
+    [0, 0],
+    [0, 10],
+    [10, 10],
+    [10, 0],
+  ],
+]);
 
 export function App() {
-
-  const { vertices, indices, transform } = generateGeometry([[0, 0],[0, 10],[10, 10], [10, 0]])
-
-  const show = useCallback(()=> {
+  const show = useCallback(() => {
     Forma.render.addMesh({
       geometryData: {
-        position: vertices,
-        index: indices
+        position,
       },
-      transform: transform
-    })
-  }, [])
+      transform: transform,
+    });
+  }, []);
 
-  const add = useCallback(() => {
+  const add = useCallback(async () => {
     const { urn } = await Forma.integrateElements.createElementHierarchy({
       authcontext: Forma.getProjectId(),
       data: {
@@ -55,8 +78,8 @@ export function App() {
               geometry: {
                 type: "Inline",
                 format: "Mesh",
-                verts: vertices,
-                faces: indices
+                verts: [...position],
+                faces: [...indices],
               },
             },
           },
@@ -64,8 +87,13 @@ export function App() {
       },
     });
 
-    await Forma.proposal.addElement({urn, transform})
-  }, [])
+    await Forma.proposal.addElement({ urn, transform });
+  }, []);
 
-  return <div><button onClick={show}>Show</button><button onClick={add}>Add</button></div>;
+  return (
+    <div>
+      <button onClick={show}>Show</button>
+      <button onClick={add}>Add</button>
+    </div>
+  );
 }

@@ -1,12 +1,12 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
-import { useCallback } from "preact/hooks";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import { usePersistedCameraPositions } from "./usePersistedCameraPositions";
 
 const transitionTimeMs = 2000;
 
 export function App() {
   // Bonus task: Replace with useState([]) to remove
-  const [cameraPositions, setCameraPositions] = usePersistedCameraPositions();
+  const [cameraPositions, setCameraPositions] = useState([]); // usePersistedCameraPositions();
 
   const reset = useCallback(() => setCameraPositions(() => []), []);
 
@@ -16,11 +16,13 @@ export function App() {
     setCameraPositions((positions) => [...positions, { position, target }]);
   }, []);
 
-  const play = useCallback(() => {
-    for (let p of cameraPositions) {
-      const { position, target } = p;
+  useEffect(() => {
+    console.log(cameraPositions);
+  }, [cameraPositions]);
 
-      Forma.camera.move({ position, target, transitionTimeMs });
+  const play = useCallback(async () => {
+    for (let { position, target } of cameraPositions) {
+      await Forma.camera.move({ position, target, transitionTimeMs });
     }
   }, [cameraPositions]);
 
