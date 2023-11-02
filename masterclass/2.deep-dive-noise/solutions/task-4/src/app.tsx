@@ -36,8 +36,8 @@ async function runAnalysis(triangles) {
   // Assuming scale = 1 meter
   for (let i = 0; i < width; i++) {
     for (let j = 0; j < height; j++) {
-      const x = min.x + i;
-      const y = min.y + j;
+      const x = min.x + j;
+      const y = min.y + (height - i);
 
       const position = new Vector3(x, y, max.z + 1);
       const direction = new Vector3(0, 0, -1);
