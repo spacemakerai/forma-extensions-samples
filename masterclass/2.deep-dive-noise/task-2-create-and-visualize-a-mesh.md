@@ -17,6 +17,9 @@ Use a library like `extrude-geometry` to create a mesh based on an extruded poly
 Use `Forma.terrain.elevationAt(x,y)` to determine the `z` elevation of each point 
 in the polygon and translate the polygon to this elevation.
 
+Note: we are going to add the `elevationAt` shortly, for now you need to hard code the value. 
+There is a way to use the technique from `task-4` to raytrace onto the terrain.
+
 
 ## Render the geometry to the scene
 
