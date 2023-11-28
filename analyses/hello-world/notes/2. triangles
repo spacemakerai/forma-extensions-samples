@@ -1,0 +1,5 @@
+const allTriangles = await Forma.geometry.getTriangles({ path: "root" });
+
+await Forma.render.addMesh({
+  geometryData: { position: allTriangles },
+});

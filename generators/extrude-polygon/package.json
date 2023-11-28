@@ -1,0 +1,13 @@
+{
+  "name": "helloworld",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "watch": "npx esbuild --watch --bundle --format=esm --outfile=index.js generator.js",
+    "serve": "npx http-server --cors -c-1 --port 3001"
+  },
+  "dependencies": {
+    "geometry-extrude": "^0.2.1"
+  },
+  "devDependencies": {}
+}
