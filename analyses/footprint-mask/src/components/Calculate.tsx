@@ -84,11 +84,8 @@ export default function CalculateAndDraw() {
         origin.x = x0 + SCALE / 2 + SCALE * j;
         raycaster.set(origin, direction);
         const intersection = raycaster.intersectObjects(scene.children);
-        const x = Math.floor(j);
-        const y = Math.floor(i);
-        let color = colors[intersection.length === 0 ? 0 : 1];
-        ctx!.fillStyle = color;
-        ctx!.fillRect(x, y, 1, 1);
+        ctx!.fillStyle = colors[intersection.length === 0 ? 0 : 1];
+        ctx!.fillRect(j, i, 1, 1);
       }
     }
 
