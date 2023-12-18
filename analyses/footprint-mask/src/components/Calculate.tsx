@@ -78,9 +78,9 @@ export default function CalculateAndDraw() {
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext("2d");
-    for (let i = 0; i < height / SCALE; i++) {
+    for (let i = 0; i < height; i++) {
       origin.y = y0 - SCALE / 2 - SCALE * i;
-      for (let j = 0; j < width / SCALE; j++) {
+      for (let j = 0; j < width; j++) {
         origin.x = x0 + SCALE / 2 + SCALE * j;
         raycaster.set(origin, direction);
         const intersection = raycaster.intersectObjects(scene.children);
