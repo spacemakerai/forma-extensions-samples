@@ -98,7 +98,7 @@ export default function CalculateAndDraw() {
     };
 
     await Forma.terrain.groundTexture.add({
-      name: "TEST_CANVAS",
+      name: "footprint_mask",
       canvas,
       position,
       scale: { x: SCALE, y: SCALE },
