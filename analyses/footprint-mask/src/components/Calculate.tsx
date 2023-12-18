@@ -89,8 +89,6 @@ export default function CalculateAndDraw() {
       }
     }
 
-    // need to find the reference point of the terrain to place the canvas
-    // for this analysis, it's the middle of the terrain
     const position = {
       x: x0 + (width * SCALE) / 2,
       y: y0 - (height * SCALE) / 2,
