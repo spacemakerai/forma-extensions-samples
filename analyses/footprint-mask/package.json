@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "forma-embedded-view-sdk": "0.40.1",
+    "forma-embedded-view-sdk": "0.42.0",
     "preact": "^10.17.1",
     "three": "^0.157.0",
     "three-mesh-bvh": "^0.6.7"

@@ -21,20 +21,6 @@ const raycaster = new THREE.Raycaster();
 // @ts-ignore
 raycaster.firstHitOnly = true;
 
-function concatenate(...arrays: Float32Array[]) {
-  let totalLength = 0;
-  for (const arr of arrays) {
-    totalLength += arr.length;
-  }
-  const result = new Float32Array(totalLength);
-  let offset = 0;
-  for (const arr of arrays) {
-    result.set(arr, offset);
-    offset += arr.length;
-  }
-  return result;
-}
-
 export const SCALE = 1;
 // width and height in pixels
 const width = 1000;
@@ -45,20 +31,16 @@ const y0 = 250;
 
 export default function CalculateAndDraw() {
   const calculateFootprint = useCallback(async () => {
-    const buildingPaths = await Forma.geometry.getPathsByCategory({
-      category: "building",
+    const terrainPaths = await Forma.geometry.getPathsByCategory({
+      category: "terrain",
     });
-    const genericPaths = await Forma.geometry.getPathsByCategory({
-      category: "generic",
+    const constraintPaths = await Forma.geometry.getPathsByCategory({
+      category: "constraints",
     });
-
-    const trianglesPerPath = await Promise.all(
-      [...buildingPaths, ...genericPaths].map((path) =>
-        Forma.geometry.getTriangles({ path })
-      )
-    );
-
-    const triangles = concatenate(...trianglesPerPath);
+    const vegetationPaths = await Forma.geometry.getPathsByCategory({
+      category: "vegetation",
+    });
+    const triangles = await Forma.geometry.getTriangles({excludedPaths: [...terrainPaths, ...vegetationPaths, ...constraintPaths]});
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(triangles, 3));
     const material = new THREE.MeshBasicMaterial();

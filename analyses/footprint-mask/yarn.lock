@@ -1301,10 +1301,10 @@ for-each@^0.3.3:
   dependencies:
     is-callable "^1.1.3"
 
-forma-embedded-view-sdk@0.40.1:
-  version "0.40.1"
-  resolved "https://registry.yarnpkg.com/forma-embedded-view-sdk/-/forma-embedded-view-sdk-0.40.1.tgz#1e96f5124efb5c5c2307cc541eaa58307c9f107e"
-  integrity sha512-kyDUNyrbyIyaanbQB+pY8LOKgnFPH7Pdplg7nRp3JeQ6qkiNTwq1fImZoUhROSxyxxAjYcuA0z8u8cgbJ41dxA==
+forma-embedded-view-sdk@0.42.0:
+  version "0.42.0"
+  resolved "https://registry.yarnpkg.com/forma-embedded-view-sdk/-/forma-embedded-view-sdk-0.42.0.tgz#5e066035fe7db1c9e1c465288dd3bba43f0c6196"
+  integrity sha512-6W0SiJyCjH5hLwbqTe1ZARhyZqNuqnG5920g83SqMFiu244gZmnJvuV2D062/7ZrvA1q1CiZvcMpGXzB1aTPxw==
 
 fs.realpath@^1.0.0:
   version "1.0.0"
