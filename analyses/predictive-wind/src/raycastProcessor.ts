@@ -39,7 +39,6 @@ export function generateHeightMaps(
         y * 1.5 + centerPosition[1],
         10000
       );
-      console.log(x, y);
       raycaster.set(origin, direction);
       const terrainIntersection = raycaster.intersectObjects(
         terrainScene.children
