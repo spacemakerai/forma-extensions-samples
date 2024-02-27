@@ -1,0 +1,21 @@
+{
+  "name": "predictive-wind",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "forma-embedded-view-sdk": "^0.54.1",
+    "three": "^0.157.0",
+    "three-mesh-bvh": "^0.6.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vite": "^5.1.4",
+    "@types/three": "^0.157.0"
+  }
+}
