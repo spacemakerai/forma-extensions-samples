@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>replit</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script type="module">
+        import {Forma} from "https://esm.sh/forma-embedded-view-sdk/auto";
+        window.Forma = Forma;
+    </script>
+    <link rel="stylesheet" href="https://app.autodeskforma.eu/design-system/v2/forma/styles/base.css"/>
+    <title>UK Buildings Data</title>
+    <link rel="stylesheet" href="https://app.autodeskforma.eu/design-system/v2/forma/styles/base.css">
+    <script type="module" src="https://app.autodeskforma.eu/design-system/v2/weave/components/button/weave-button.js"></script>
+    <script type="module" src="https://app.autodeskforma.eu/design-system/v2/weave/components/input/weave-input.js"></script> 
+</head>
+
+<body>
+    <div style="display: flex; flex-direction: column; align-items: center; font-size: 1.2em;">
+        <h1>UK Buildings data</h1>
+        <br>
+        <h2>This Extension uses your API Key from <a href="https://osdatahub.os.uk/">https://osdatahub.os.uk/</a> </h2>
+        <h2>Fetched data will be stored in the Library</h3>
+        <br>
+        <h3>Please follow the Instructions below to get started</h3>
+        <p>To use this data processor, you need an API key from OS Data Hub. Follow these steps to obtain your API key:</p>
+        <ol>
+            <li>Go to the OS Data Hub website: <a href="https://osdatahub.os.uk/">https://osdatahub.os.uk/</a>.</li>
+            <li>If you don't have an account, sign up by clicking the "Sign Up" button and following the registration process.</li>
+            <li>Once logged in, navigate to the section where you can create a new project.</li>
+            <li>Select the "OS NGD API – Features" or a similarly named option when choosing the API products for your project.</li>
+            <li>Fill in the details for your project, such as naming your project and providing a brief description.</li>
+            <li>After creating your project with the selected API, the platform will generate an API key for you.</li>
+            <li>Copy the API key to a secure location. You will need this key to use the data processor.</li>
+        </ol>
+        <div id="inputArea" style="display: flex; justify-content: center; gap: 10px;">
+            <label for="apiKey" style="align-self: center;">Enter API Key:</label>
+            <weave-input type="text" id="apiKey" name="apiKey" style="font-size: 1.2em;"></weave-input> <!-- Hypothetical element -->
+            <weave-button id="processButton">Process Data</weave-button>
+        </div>
+
+        <div id="status">
+            <p id="statusMessage">Enter an API key to begin.</p>
+        </div>
+    </div>
+
+    
+    <script src="script.js" type="module"></script>
+    <script src="ui.js" type="module"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.4/proj4.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/osmtogeojson@3.0.0-beta.5/osmtogeojson.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+</body>
+
+</html>
