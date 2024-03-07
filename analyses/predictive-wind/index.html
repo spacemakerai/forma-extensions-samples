@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Predictive wind example</title>
+  </head>
+  <body>
+    <div style="display: flex; flex-direction: column">
+      <h1>Predictive wind example</h1>
+      <select name="comfortScale" id="comfortScale">
+        <option value="lawson_lddc">lawson_lddc</option>
+        <option value="davenport">davenport</option>
+        <option value="nen8100">nen8100</option>
+      </select>
+      <button id="predictButton">Click here, then scene position</button>
+      <div id="info"></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
