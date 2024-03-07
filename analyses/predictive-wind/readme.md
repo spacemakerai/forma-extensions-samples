@@ -11,7 +11,7 @@ There has been done simple sanity check of comparing results from this approach 
 
 ## Usage
 
-`yarn && yarn dev` will run the extension on `http://localhost:5173`.
+This repository uses `yarn` as package manager. Run `yarn` to install dependencies, and `yarn dev` to start the development server. It will then run on `http://localhost:5173`.
 
 Configure your extension to load `localhost:5173`, and open the extension.
 
