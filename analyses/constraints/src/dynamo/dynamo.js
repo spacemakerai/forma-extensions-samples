@@ -40,12 +40,10 @@ export async function run(code, state) {
 
     return { data: await response.json(), type: "success" };
   } catch (e) {
-    if (e.name === "AbortError") {
-      if (signal.reason === "aborting previous request") {
-        return { type: "aborted" };
-      } else {
-        throw Error("Request timed out after 30 seconds");
-      }
+    if (e === "aborting previous request") {
+      return { type: "aborted" };
+    } else if (e === "timeout") {
+      throw Error("Request timed out after 30 seconds");
     } else {
       throw e;
     }
