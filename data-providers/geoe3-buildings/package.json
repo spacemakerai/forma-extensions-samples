@@ -8,9 +8,9 @@
   },
   "dependencies": {
     "cityjson-threejs-loader": "git+https://github.com/cityjson/cityjson-threejs-loader.git",
-    "forma-embedded-view-sdk": "^0.21.1",
-    "three": "^0.156.1",
-    "proj4": "^2.9.1"
+    "forma-embedded-view-sdk": "^0.54.3",
+    "proj4": "^2.9.1",
+    "three": "^0.156.1"
   },
   "devDependencies": {
     "vite": "^4.4.9"

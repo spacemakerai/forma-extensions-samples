@@ -112,6 +112,11 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz#786c5f41f043b07afb1af37683d7c33668858f6d"
   integrity sha512-kTdfRcSiDfQca/y9QIkng02avJ+NCaQvrMejlsB3RRv5sE9rRoeBPISaZpKxHELzRxZyLvNts1P27W3wV+8geQ==
 
+"@types/geojson@^7946.0.13":
+  version "7946.0.14"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.14.tgz#319b63ad6df705ee2a65a73ef042c8271e696613"
+  integrity sha512-WCfD5Ht3ZesJUsONdhvm84dmzWOiOzOAqOncN0++w0lBw1o8OuDNJF2McvvCef/yBqb/HYRahp1BYtODFQ8bRg==
+
 "cityjson-threejs-loader@git+https://github.com/cityjson/cityjson-threejs-loader.git":
   version "0.4.0"
   resolved "git+https://github.com/cityjson/cityjson-threejs-loader.git#7376b620d5fa333303d7a28e7e2d27b8b2570646"
@@ -151,12 +156,18 @@ esbuild@^0.18.10:
     "@esbuild/win32-ia32" "0.18.20"
     "@esbuild/win32-x64" "0.18.20"
 
-forma-embedded-view-sdk@^0.21.1:
-  version "0.21.2"
-  resolved "https://registry.yarnpkg.com/forma-embedded-view-sdk/-/forma-embedded-view-sdk-0.21.2.tgz#e1be7c1a6596cb16f39d4a796587524c10c5afc9"
-  integrity sha512-uuIESWVAI9sqPh2y3Tzl1q+8Yf3Uq+gwq8intL+MuRf0HMFcyh4w1rjqJz1bVm3+YtUMEFRMSYI+GP63jmY2vA==
+forma-elements@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/forma-elements/-/forma-elements-1.5.2.tgz#abc39a5d073fdebcb0f56c107f85d69cedb78dce"
+  integrity sha512-OQ4ntWlSePs9rdZs56WxVHD4uFpu//bj1vdYZmG5ANwQpkn+9PL33BXRQ7IrxEDEoKssfRf1uUjg8BYqizgiLA==
+
+forma-embedded-view-sdk@^0.54.3:
+  version "0.54.3"
+  resolved "https://registry.yarnpkg.com/forma-embedded-view-sdk/-/forma-embedded-view-sdk-0.54.3.tgz#66e760a764abe6956c51ccc9da08b4c332627256"
+  integrity sha512-fc9Lu1YfTt41ZaUkGgx557g/hCN0vc7MJnHtPp0zCMr+7tsEVdwu+afN84aOiBTiETQzlAlm7YboE8ODBM+m+w==
   dependencies:
-    uuid "^9.0.0"
+    "@types/geojson" "^7946.0.13"
+    forma-elements "^1.5.2"
 
 fsevents@~2.3.2:
   version "2.3.3"
@@ -211,11 +222,6 @@ three@^0.156.1:
   version "0.156.1"
   resolved "https://registry.yarnpkg.com/three/-/three-0.156.1.tgz#bab4fec121a5b3975eb4f4d227d9c912171eb399"
   integrity sha512-kP7H0FK9d/k6t/XvQ9FO6i+QrePoDcNhwl0I02+wmUJRNSLCUIDMcfObnzQvxb37/0Uc9TDT0T1HgsRRrO6SYQ==
-
-uuid@^9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.0.tgz#592f550650024a38ceb0c562f2f6aa435761efb5"
-  integrity sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==
 
 vite@^4.4.9:
   version "4.4.9"
