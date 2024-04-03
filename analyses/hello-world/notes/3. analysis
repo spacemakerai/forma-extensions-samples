@@ -1,9 +1,0 @@
-const analyses = await Forma.analysis.list({});
-
-const sun = analyses.find(
-  ({ analysisId }) => analysisId === "V9tECLh7xv5DdrHp9zJXaQ"
-);
-
-const grid = await Forma.analysis.getGroundGrid({ analysis: sun });
-
-console.log({ grid });
