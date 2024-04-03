@@ -3,10 +3,6 @@ import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { Forma } from "forma-embedded-view-sdk/auto";
 import proj4 from "proj4";
 
-const parser = new CityJSONParser();
-const loader = new CityJSONLoader(parser);
-const exporter = new GLTFExporter();
-
 export async function createElementFromGlb(name, glbContents, srid, refPoint) {
   const { fileId } = await Forma.integrateElements.uploadFile({
     authcontext: Forma.getProjectId(),
@@ -114,9 +110,18 @@ function transformGlbPositions(glbPositions, oldRefPoint, newRefPoint) {
 }
 
 async function order() {
-  //Trigger polygon selection for the user, the ordering process continues when a polygon is selected.
+  const orderState = document.getElementById("orderState");
+  orderState.innerText = "Select a polygon to order data";
 
+  //Trigger polygon selection for the user, the ordering process continues when a polygon is selected.
   const selectedPolygon = await Forma.designTool.getPolygon();
+
+  if (!selectedPolygon) {
+    orderState.innerText = "";
+    return;
+  }
+
+  orderState.innerText = "Processing order...";
 
   const { srid, refPoint, projString } = await Forma.project.get();
 
@@ -131,101 +136,88 @@ async function order() {
   //This particular example buildings provider in Finland requres a bbox in this particular format.
   const bbox = polygonToBbox(transformedPolygon);
   const bbox_string = bbox.flat().join(",");
-
   fetch(
     `https://geoe3platform.eu/geoe3/buildings3d/search?collections=buildings3d_FI&bbox=${bbox_string}&f=cityjson`
   )
     .then((res) => res.json())
     .then((json) => {
-      const originalCityObjects = json.CityObjects;
+      const parser = new CityJSONParser();
+      const loader = new CityJSONLoader(parser);
+      const exporter = new GLTFExporter();
+      loader.load(json);
+      const mesh = loader.scene.children[0];
 
-      for (const [id, cityObject] of Object.entries(originalCityObjects)) {
-        // Create a new CityJSON object for this CityObject
-        const newCityJson = {
-          ...json,
-          CityObjects: {
-            [id]: cityObject, // This new CityJSON only contains this CityObject
-          },
-        };
-        loader.load(newCityJson);
-        console.log(newCityJson, loader);
+      // Debug by rendering directly into designmode scene
+      // setGeometryColor(new Color(0xfc6603), mesh.geometry, 0.5);
+      // Forma.render.addMesh({
+      //   geometryData: {
+      //     position: new Float32Array(
+      //       mesh.geometry.getAttribute("position").array
+      //     ),
+      //     normal: new Float32Array(mesh.geometry.getAttribute("normal").array),
+      //     color: new Uint8Array(mesh.geometry.getAttribute("color").array),
+      //   },
+      //   transform: new Matrix4().toArray(),
+      // });
 
-        const mesh = loader.scene.children[0];
+      // The GLTFExporter creates non-compliant GLBs when these are present
+      // Specifically, it creates accessors with componenttypes that are not spec-compliant, as these are signed integer arrays.
+      // Could probably map these into attributes/TypedArrays that would work, but they are not needed for the base geometry,
+      // so easier just to remove them for this example.
+      delete mesh.geometry.attributes.surfacetype;
+      delete mesh.geometry.attributes.type;
+      delete mesh.geometry.attributes.lodid;
+      delete mesh.geometry.attributes.boundaryid;
+      delete mesh.geometry.attributes.geometryid;
+      delete mesh.geometry.attributes.objectid;
+      // The GLTFExporter creates an InterleavedBuffer when both normal and position attributes are set.
+      // As of now, the merging code in designmode only supports non-interleaved attributes.
+      delete mesh.geometry.attributes.normal;
 
-        // Debug by rendering directly into designmode scene
-        // setGeometryColor(new Color(0xfc6603), mesh.geometry, 0.5);
-        // Forma.render.addMesh({
-        //   geometryData: {
-        //     position: new Float32Array(
-        //       mesh.geometry.getAttribute("position").array
-        //     ),
-        //     normal: new Float32Array(mesh.geometry.getAttribute("normal").array),
-        //     color: new Uint8Array(mesh.geometry.getAttribute("color").array),
-        //   },
-        //   transform: new Matrix4().toArray(),
-        // });
+      const position = mesh.geometry.attributes.position.array;
+      const oldRefPoint = [
+        loader.matrix.elements[12],
+        loader.matrix.elements[13],
+      ];
 
-        // The GLTFExporter creates non-compliant GLBs when these are present
-        // Specifically, it creates accessors with componenttypes that are not spec-compliant, as these are signed integer arrays.
-        // Could probably map these into attributes/TypedArrays that would work, but they are not needed for the base geometry,
-        // so easier just to remove them for this example.
-        delete mesh.geometry.attributes.surfacetype;
-        delete mesh.geometry.attributes.type;
-        delete mesh.geometry.attributes.lodid;
-        delete mesh.geometry.attributes.boundaryid;
-        delete mesh.geometry.attributes.geometryid;
-        delete mesh.geometry.attributes.objectid;
-        // The GLTFExporter creates an InterleavedBuffer when both normal and position attributes are set.
-        // As of now, the merging code in designmode only supports non-interleaved attributes.
-        delete mesh.geometry.attributes.normal;
+      //Cityjson comes with coordinates expressed locally to a refPoint. We read it out through the matrix in the loader.
+      transformGlbPositions(position, oldRefPoint, refPoint);
 
-        const position = mesh.geometry.attributes.position.array;
-        const oldRefPoint = [
-          loader.matrix.elements[12],
-          loader.matrix.elements[13],
-        ];
-
-        //Cityjson comes with coordinates expressed locally to a refPoint. We read it out through the matrix in the loader.
-        transformGlbPositions(position, oldRefPoint, refPoint);
-
-        // Flip to y-up
-        let tmp;
-        for (let i = 0; i < position.length; i += 3) {
-          tmp = position[i + 1];
-          position[i + 1] = position[i + 2];
-          position[i + 2] = -tmp;
-        }
-
-        return new Promise((res, rej) => {
-          exporter.parse(
-            loader.scene,
-            (glb) => {
-              res(glb);
-            },
-            (error) => {
-              rej(error);
-            },
-            {
-              binary: true,
-            }
-          );
-        })
-          .then((glb) => {
-            return createElementFromGlb(
-              `DPE Buildings ${id}`,
-              glb,
-              srid,
-              refPoint
-            );
-          })
-          .then((urn) => {
-            putInLibrary(urn, `DPE Buildings ${id}`);
-            const orderState = document.getElementById("orderState");
-            orderState.innerText =
-              "Order successful, go to library to place the buildings";
-          })
-          .catch((e) => console.error(e));
+      // Flip to y-up
+      let tmp;
+      for (let i = 0; i < position.length; i += 3) {
+        tmp = position[i + 1];
+        position[i + 1] = position[i + 2];
+        position[i + 2] = -tmp;
       }
+
+      return new Promise((res, rej) => {
+        exporter.parse(
+          loader.scene,
+          (glb) => {
+            res(glb);
+          },
+          (error) => {
+            rej(error);
+          },
+          {
+            binary: true,
+          }
+        );
+      });
+    })
+    .then((glb) => {
+      return createElementFromGlb("DPE Buildings", glb, srid, refPoint);
+    })
+    .then((urn) => {
+      putInLibrary(urn, "DPE Buildings");
+      const orderState = document.getElementById("orderState");
+      orderState.innerText =
+        "Order successful! Your buildings have been uploaded.";
+    })
+    .catch((e) => {
+      console.error(e);
+      orderState.innerText = "Order failed. Please try again.";
     });
 }
 
