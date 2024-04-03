@@ -7,24 +7,7 @@ const parser = new CityJSONParser();
 const loader = new CityJSONLoader(parser);
 const exporter = new GLTFExporter();
 
-export async function createElementFromGlb(name, glbContents, srid, refPoint) {
-  const { fileId } = await Forma.integrateElements.uploadFile({
-    authcontext: Forma.getProjectId(),
-    data: glbContents,
-  });
-
-  const element = {
-    id: "some-element-id",
-    children: [],
-    properties: {
-      geometry: {
-        type: "File",
-        format: "glb",
-        s3Id: fileId,
-      },
-    },
-  };
-
+export async function createElementFromGlb(name, elements, srid, refPoint) {
   const scale = 1; // Model is assumed to be in meters
   const scalingElement = {
     id: "root",
@@ -36,24 +19,30 @@ export async function createElementFromGlb(name, glbContents, srid, refPoint) {
       },
       name,
     },
-    children: [
-      {
-        id: element.id,
-        transform: [
-          [scale, 0, 0, 0],
-          [0, scale, 0, 0],
-          [0, 0, scale, 0],
-          [0, 0, 0, 1],
-        ].flat(),
-      },
-    ],
+    children: elements.map((element) => ({
+      id: element.id,
+      transform: [
+        [scale, 0, 0, 0],
+        [0, scale, 0, 0],
+        [0, 0, scale, 0],
+        [0, 0, 0, 1],
+      ].flat(),
+    })),
   };
+
+  const elementsMap = elements.reduce(
+    (obj, element) => ({
+      ...obj,
+      [element.id]: element,
+    }),
+    {}
+  );
 
   const { urn } = await Forma.integrateElements.createElementHierarchy({
     authcontext: Forma.getProjectId(),
     data: {
       rootElement: scalingElement.id,
-      elements: { [scalingElement.id]: scalingElement, [element.id]: element },
+      elements: { [scalingElement.id]: scalingElement, ...elementsMap },
     },
   });
 
@@ -138,6 +127,8 @@ async function order() {
     .then((res) => res.json())
     .then((json) => {
       const originalCityObjects = json.CityObjects;
+      console.log(json);
+      const promises = [];
 
       for (const [id, cityObject] of Object.entries(originalCityObjects)) {
         // Create a new CityJSON object for this CityObject
@@ -178,6 +169,9 @@ async function order() {
         // The GLTFExporter creates an InterleavedBuffer when both normal and position attributes are set.
         // As of now, the merging code in designmode only supports non-interleaved attributes.
         delete mesh.geometry.attributes.normal;
+        delete mesh.geometry.attributes._OBJECTID;
+        delete mesh.geometry.attributes._LODID;
+        console.log(mesh.geometry.attributes);
 
         const position = mesh.geometry.attributes.position.array;
         const oldRefPoint = [
@@ -196,36 +190,75 @@ async function order() {
           position[i + 2] = -tmp;
         }
 
-        return new Promise((res, rej) => {
-          exporter.parse(
-            loader.scene,
-            (glb) => {
-              res(glb);
-            },
-            (error) => {
-              rej(error);
-            },
-            {
-              binary: true,
-            }
-          );
-        })
-          .then((glb) => {
-            return createElementFromGlb(
-              `DPE Buildings ${id}`,
-              glb,
-              srid,
-              refPoint
+        promises.push(
+          new Promise((res, rej) => {
+            exporter.parse(
+              loader.scene,
+              (glb) => {
+                const blob = new Blob([glb], {
+                  type: "application/octet-stream",
+                });
+                const url = URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `${id}.glb`;
+                link.click();
+
+                // Remember to revoke the object URL to free memory
+                URL.revokeObjectURL(url);
+                res({ id, glb });
+              },
+              (error) => {
+                rej(error);
+              },
+              {
+                binary: true,
+              }
             );
           })
-          .then((urn) => {
-            putInLibrary(urn, `DPE Buildings ${id}`);
-            const orderState = document.getElementById("orderState");
-            orderState.innerText =
-              "Order successful, go to library to place the buildings";
-          })
-          .catch((e) => console.error(e));
+        );
       }
+
+      return Promise.all(promises);
+    })
+    .then((results) => {
+      const elementPromises = results.map(async ({ id, glb }) => {
+        console.log(glb);
+        const { fileId } = await Forma.integrateElements.uploadFile({
+          authcontext: Forma.getProjectId(),
+          data: glb,
+        });
+        return {
+          id,
+          children: [],
+          properties: {
+            geometry: {
+              type: "File",
+              format: "glb",
+              s3Id: fileId,
+            },
+          },
+        };
+      });
+
+      return Promise.all(elementPromises);
+    })
+    .then((elements) => {
+      // Now elements is guaranteed to be an array of all elements
+      return createElementFromGlb(
+        `DPE Buildings ${elements[0].id}`,
+        elements,
+        srid,
+        refPoint
+      )
+        .then((urn) => {
+          putInLibrary(urn, `DPE Buildings ${elements[0].id}`);
+          const orderState = document.getElementById("orderState");
+          orderState.innerText =
+            "Order successful, go to library to place the buildings";
+        })
+        .catch((e) => console.error(e));
     });
 }
 
