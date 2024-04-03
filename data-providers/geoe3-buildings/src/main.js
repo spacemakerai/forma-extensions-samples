@@ -3,10 +3,6 @@ import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { Forma } from "forma-embedded-view-sdk/auto";
 import proj4 from "proj4";
 
-const parser = new CityJSONParser();
-const loader = new CityJSONLoader(parser);
-const exporter = new GLTFExporter();
-
 export async function createElementFromGlb(name, elements, srid, refPoint) {
   const scale = 1; // Model is assumed to be in meters
   const scalingElement = {
@@ -138,6 +134,10 @@ async function order() {
             [id]: cityObject, // This new CityJSON only contains this CityObject
           },
         };
+        const parser = new CityJSONParser();
+        const loader = new CityJSONLoader(parser);
+        const exporter = new GLTFExporter();
+
         loader.load(newCityJson);
         console.log(newCityJson, loader);
 
@@ -195,18 +195,6 @@ async function order() {
             exporter.parse(
               loader.scene,
               (glb) => {
-                const blob = new Blob([glb], {
-                  type: "application/octet-stream",
-                });
-                const url = URL.createObjectURL(blob);
-
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = `${id}.glb`;
-                link.click();
-
-                // Remember to revoke the object URL to free memory
-                URL.revokeObjectURL(url);
                 res({ id, glb });
               },
               (error) => {
