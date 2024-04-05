@@ -4,14 +4,11 @@ import {
   disposeBoundsTree,
   acceleratedRaycast,
 } from "three-mesh-bvh";
-import {
-  createCanvasFromSlope,
-  degreesToRadians,
-} from "../../../../src/features/terrain-slope/utils";
+import { createCanvasFromSlope, degreesToRadians } from "./utils";
 import { useCallback } from "preact/hooks";
 import { Forma } from "forma-embedded-view-sdk/auto";
-import { CANVAS_NAME, SCALE } from "../app";
-import { saveCanvas, saveFloatArray } from "../services/storage";
+import { CANVAS_NAME, SCALE } from "./TerrainSlope";
+import { saveCanvas, saveFloatArray } from "./storage";
 
 type Props = {
   steepnessThreshold: number;
@@ -144,8 +141,8 @@ export default function CalculateAndStore({ steepnessThreshold }: Props) {
   }, [steepnessThreshold]);
 
   return (
-    <button onClick={calculateTerrainSteepness} style="width: 100%;">
-      Calculate and store results
-    </button>
+    <weave-button onClick={calculateTerrainSteepness}>
+      Calculate terrain slope
+    </weave-button>
   );
 }

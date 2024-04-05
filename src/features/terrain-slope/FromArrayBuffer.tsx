@@ -1,11 +1,8 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { useCallback, useEffect, useState } from "preact/hooks";
-import {
-  createCanvasFromSlope,
-  degreesToRadians,
-} from "../../../../src/features/terrain-slope/utils";
-import { SCALE } from "../app";
-import { getFloat32Array } from "../services/storage";
+import { createCanvasFromSlope, degreesToRadians } from "./utils";
+import { SCALE } from "./TerrainSlope";
+import { getFloat32Array } from "./storage";
 
 type Props = {
   steepnessThreshold: number;
@@ -69,8 +66,8 @@ export default function FromTerrainBuffer({ steepnessThreshold }: Props) {
   }
 
   return (
-    <button onClick={calculateFromArrrayBuffer} style="width: 100%">
-      Draw slope from array stored buffer
-    </button>
+    <weave-button onClick={calculateFromArrrayBuffer}>
+      Draw slope from stored array buffer
+    </weave-button>
   );
 }
