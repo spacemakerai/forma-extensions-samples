@@ -212,7 +212,6 @@ async function order() {
     })
     .then((results) => {
       const elementPromises = results.map(async ({ id, glb }) => {
-        console.log(glb);
         const { fileId } = await Forma.integrateElements.uploadFile({
           authcontext: Forma.getProjectId(),
           data: glb,
