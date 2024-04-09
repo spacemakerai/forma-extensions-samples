@@ -6,7 +6,7 @@ html {
 }
 body {
   margin: 0;
-  padding: 0;
+  padding: 0 1px;
   box-sizing: border-box;
   font-family: "Artifakt Element", sans-serif;
   min-height: 900px;
