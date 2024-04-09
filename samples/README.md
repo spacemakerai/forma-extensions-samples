@@ -21,7 +21,7 @@ and make sure you have enabled both right and left panel in you configuration.
 
 You also need to make sure your extension is installed in your project.
 
-To start the extension, you'll need to install dependencies with [pnpm](https://pnpm.io/installation):
+To start the extension, you'll need to install dependencies with:
 
 ```sh
 npm install
