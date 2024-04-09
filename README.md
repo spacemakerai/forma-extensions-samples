@@ -3,7 +3,7 @@
 This extension contains a sample of functionality that is possible when using the [Forma embedded view SDK](https://app.autodeskforma.com/forma-embedded-view-sdk/docs/index.html). Feel free to fork or clone this repo if you wish to use some
 of its functionality or need a starting point for your extension.
 
-If you wish to install the extension in your project, the extension ID is `36d95978-5b68-43c5-bfcc-952f6a97fc90`
+If you wish to install the extension in your project, the unpublished extension ID `36d95978-5b68-43c5-bfcc-952f6a97fc90` is configured to be used with this sample extension running locally.
 
 The extension exposes functionality in both the left panel, and the right side analysis panel.
 You can also open the left side as a floating panel to get a feel for how that works as well.
