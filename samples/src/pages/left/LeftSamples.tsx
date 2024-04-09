@@ -28,14 +28,14 @@ export default function LeftSamples() {
       <ExampleItem
         name="Color Buildings"
         text="Select a building and paint it your favorite color"
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/"
       >
         <ColorBuildings />
       </ExampleItem>
       <ExampleItem
         text="Export your proposal as an STL"
         name="Export as proposal as STL"
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/src/features/export-stl/export-stl.ts"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/export-stl/export-stl.ts"
       >
         <weave-button variant="solid" onClick={exportStl}>
           Export
@@ -48,18 +48,9 @@ export default function LeftSamples() {
             positions and create a fly by in the scene with your desired
             transition time
         `}
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/src/features/fly-trough/FlyThrough.tsx"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/fly-trough/FlyThrough.tsx"
       >
         <FlyThrough />
-      </ExampleItem>
-      <ExampleItem
-        text="Order geo3 Data. This will only work in Finland, so you need to create a project there to test out this example"
-        name="Order geo3 data"
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/src/features/geo3/index.ts"
-      >
-        <weave-button variant="solid" onClick={exportStl}>
-          Order data
-        </weave-button>
       </ExampleItem>
       <weave-button
         onClick={() =>

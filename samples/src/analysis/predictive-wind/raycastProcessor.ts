@@ -29,7 +29,6 @@ export function generateHeightMaps(
   centerPosition: [number, number],
 ): HeightMaps {
   console.time("generateHeightMaps");
-  console.log("center", centerPosition);
   const direction = new THREE.Vector3(0, 0, -1);
   const terrainResult = [];
   const allResult = [];

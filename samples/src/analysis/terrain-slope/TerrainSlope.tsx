@@ -19,7 +19,6 @@ export const CANVAS_NAME = "terrain slope";
 
 export default function TerrainSlope() {
   const [projectSettings, setProjectSettings] = useState<Settings>();
-  console.log(projectSettings);
   useEffect(() => {
     getJSONObject("settings").then((res) => {
       if (!res) {
@@ -50,7 +49,6 @@ export default function TerrainSlope() {
           type="number"
           value={projectSettings.steepnessThreshold}
           onChange={(e: CustomEvent<{ value: number; name: string }>) => {
-            console.log(e.detail);
             setProjectSettings({
               ...projectSettings,
               steepnessThreshold: e.detail.value,
