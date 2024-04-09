@@ -9,10 +9,7 @@ The extension exposes functionality in both the left panel, and the right side a
 You can also open the left side as a floating panel to get a feel for how that works as well.
 If you find the functionality useful you can go directly to the source code by hovering the panel
 
-The functionality is seperated by what we think is the fitting placement for different types of functionality.
-
-- If you extension is an analysis of any sort, you should place it in the right menu
-- The left menu can contain both data extension, such as imports or contextual data, or authoring capabilities.
+The functionality is seperated by what we think is the fitting [placement](https://aps.autodesk.com/en/docs/forma/v1/embedded-views/introduction/) for different types of functionality.
 
 ## Run the extension from your own machine
 
@@ -24,14 +21,14 @@ and make sure you have enabled both right and left panel in you configuration.
 
 You also need to make sure your extension is installed in your project.
 
-To start the extension, you'll need to install dependencies with
+To start the extension, you'll need to install dependencies with [pnpm](https://pnpm.io/installation):
 
 ```sh
-pnpm install
+npm install
 ```
 
 and then run
 
 ```sh
-pnpm  start
+npm start
 ```

@@ -1,5 +1,3 @@
-const { options } = require("preact");
-
 module.exports = {
   root: true,
 
