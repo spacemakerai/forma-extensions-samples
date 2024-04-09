@@ -41,10 +41,6 @@ module.exports = {
       files: ["*.cjs"],
     },
   ],
-  rules: {
-    "jest/expect-expect": "off",
-    "jest/no-done-callback": "off",
-  },
   settings: {
     // We don't use jest, but eslint-config-preact includes it.
     jest: { version: 27 },
