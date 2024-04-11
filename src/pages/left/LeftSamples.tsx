@@ -4,6 +4,7 @@ import { exportStl } from "../../misc/export-stl/export-stl.ts";
 import { FlyThrough } from "../../misc/fly-trough/FlyThrough.tsx";
 import { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
+import { GeoE3Buildings } from "../../data-providers/geoe3-buildings/GeoE3Buildings.tsx";
 
 export default function LeftSamples() {
   window.focus();
@@ -51,6 +52,16 @@ export default function LeftSamples() {
         url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/fly-trough/FlyThrough.tsx"
       >
         <FlyThrough />
+      </ExampleItem>
+      <ExampleItem
+        name="GEOE3 Buildings"
+        text={`
+            The geoe3 buildings extension fetches builings from https://geoe3platform.eu/ within a user selected geometry, creates a threejs mesh, exports to GLB, creates and integrate element and adds to library.
+
+        `}
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/fly-trough/FlyThrough.tsx"
+      >
+        <GeoE3Buildings />
       </ExampleItem>
       <weave-button
         onClick={() =>
