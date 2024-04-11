@@ -31,6 +31,7 @@ export function FlyThrough() {
 
   const flyBetweenCameraPositions = async () => {
     for (const cameraPosition of cameraPositions) {
+      console.log(cameraPosition);
       await Forma.camera.move({
         ...cameraPosition,
         transitionTimeMs: transitionTime,

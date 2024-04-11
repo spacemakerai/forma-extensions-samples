@@ -10,19 +10,20 @@
   },
   "dependencies": {
     "@turf/meta": "^6.5.0",
+    "cityjson-threejs-loader": "git+https://github.com/cityjson/cityjson-threejs-loader.git",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "forma-embedded-view-sdk": "^0.59.1",
     "preact": "^10.20.1",
     "proj4": "^2.11.0",
-    "three": "^0.163.0",
+    "three": "^0.156.1",
     "three-mesh-bvh": "^0.7.3"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.8.2",
     "@types/file-saver": "^2.0.7",
     "@types/proj4": "^2.5.5",
-    "@types/three": "^0.163.0",
+    "@types/three": "^0.156",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
     "eslint": "^8.57.0",

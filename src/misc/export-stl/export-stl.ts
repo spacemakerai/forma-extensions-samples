@@ -1,6 +1,6 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import * as THREE from "three";
-import { STLExporter } from "three/examples/jsm/Addons.js";
+import { STLExporter } from "three/examples/jsm/exporters/STLExporter.js";
 
 export async function exportStl() {
   try {
