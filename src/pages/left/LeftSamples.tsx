@@ -29,14 +29,14 @@ export default function LeftSamples() {
       <ExampleItem
         name="Color Buildings"
         text="Select a building and paint it your favorite color"
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/main/"
       >
         <ColorBuildings />
       </ExampleItem>
       <ExampleItem
         text="Export your proposal as an STL"
         name="Export as proposal as STL"
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/export-stl/export-stl.ts"
+        url="https://github.com/spacemakerai/forma-extensions-samples/main/src/misc/export-stl/export-stl.ts"
       >
         <weave-button variant="solid" onClick={exportStl}>
           Export
@@ -49,7 +49,7 @@ export default function LeftSamples() {
             positions and create a fly by in the scene with your desired
             transition time
         `}
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/fly-trough/FlyThrough.tsx"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/main/src/misc/fly-trough/FlyThrough.tsx"
       >
         <FlyThrough />
       </ExampleItem>
@@ -59,7 +59,7 @@ export default function LeftSamples() {
             The geoe3 buildings extension fetches builings from https://geoe3platform.eu/ within a user selected geometry, creates a threejs mesh, exports to GLB, creates and integrate element and adds to library.
 
         `}
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/fly-trough/FlyThrough.tsx"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/main/src/data-providers/geoe3-buildings/GeoE3Buildings.tsx"
       >
         <GeoE3Buildings />
       </ExampleItem>

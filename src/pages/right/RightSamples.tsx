@@ -32,7 +32,7 @@ export default function App() {
                   easier to see the mask.
       `}
         name="Export area metrics to excel"
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/export-to-excel/ExportToExcel.tsx"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/main/src/analysis/export-to-excel/ExportToExcel.tsx"
       >
         {" "}
         <weave-button weave-button onClick={exportToExcel} variant="solid">
@@ -46,7 +46,7 @@ export default function App() {
                   easier to see the mask.
       `}
         name="Footprint mask"
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/footprint-mask/FootprintMask.tsx"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/main/src/analysis/footprint-mask/FootprintMask.tsx"
       >
         <weave-button variant="solid" onClick={calculateAndDrawFootprint}>
           Footprint mask
@@ -57,7 +57,7 @@ export default function App() {
                   Predict the wind based on the selected comfort scale.
       `}
         name="Predictive wind"
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/predictive-wind/predict.ts"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/main/src/analysis/predictive-wind/predict.ts"
       >
         <PredictiveWind />
       </ExampleItem>
@@ -67,7 +67,7 @@ export default function App() {
             representing the steepness, where red is steeper than the threshold.
             This example uses the Storage API to store the results with a given
             setting to avoid recalculation.`}
-        url="https://github.com/spacemakerai/forma-extensions-samples/tree/feat/make-one-extension/samples/src/features/terrain-slope/TerrainSlope.tsx"
+        url="https://github.com/spacemakerai/forma-extensions-samples/tree/main/src/analysis/terrain-slope/TerrainSlope.tsx"
       >
         <TerrainSlope />
       </ExampleItem>
