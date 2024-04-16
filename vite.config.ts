@@ -12,6 +12,7 @@ export default defineConfig({
       input: {
         left: "./left.html",
         right: "./right.html",
+        auth: "./auth.html",
       },
     },
   },

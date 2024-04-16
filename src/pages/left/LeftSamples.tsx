@@ -5,6 +5,7 @@ import { FlyThrough } from "../../misc/fly-trough/FlyThrough.tsx";
 import { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
 import { GeoE3Buildings } from "../../data-providers/geoe3-buildings/GeoE3Buildings.tsx";
+import Auth from "../../misc/auth/index.tsx";
 
 export default function LeftSamples() {
   window.focus();
@@ -78,6 +79,9 @@ export default function LeftSamples() {
       >
         Open as floating panel
       </weave-button>
+      <ExampleItem url="" text="Get a token" name="Test out auth">
+        <Auth />
+      </ExampleItem>
     </div>
   );
 }
