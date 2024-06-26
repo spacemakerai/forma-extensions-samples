@@ -11,7 +11,10 @@ raycaster.firstHitOnly = true;
 
 function getMinMax(array: number[]) {
   return array.reduce(
-    ([min, max], val) => [Math.min(min, val), Math.max(max, val)],
+    ([min, max], val) => [
+      Math.min(min, Math.round(val)),
+      Math.max(max, Math.round(val)),
+    ],
     [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY],
   );
 }
