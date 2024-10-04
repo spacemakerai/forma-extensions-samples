@@ -10,14 +10,10 @@ export async function processAndRenderProjectGeojson(apiKey) {
         const adjustbboxArray = adjustBBoxWithRefPoint(bbox, projectDetails.refPoint);
         const bboxWGS84 = convertBBoxToWGS84(adjustbboxArray, projectDetails.projString);
         const osBuildinggeojson = await fetchGeoJSONFromBBoxWithPagination(bboxWGS84, apiKey);
-        console.log("osBuildinggeojson", JSON.parse(JSON.stringify(osBuildinggeojson)))
-        const featureCollection = {
+        const geojson = {
             type: "FeatureCollection",
             features: osBuildinggeojson
         }
-        const geojson = recenterGeoJSON(featureCollection, projectDetails.refPoint, 'EPSG:4326', projectDetails.projString)
-
-        console.log("geojson2", JSON.parse(JSON.stringify(geojson)))
         const geoJsonWithHeightAndElevation = {
             ...geojson,
             features: geojson.features.map((feature) => ({
@@ -30,17 +26,16 @@ export async function processAndRenderProjectGeojson(apiKey) {
                 }
             }))
         }
-        const res = await Forma.experimental.geodata.normalizeVectorData(
+        const res = await Forma.geoData.upload(
             {
                 data: geoJsonWithHeightAndElevation,
-                dataType: "buildings"
+                dataType: "buildings",
+                geoLocation: {
+                     srid: 4326,
+                     refPoint: [0, 0]
+                   }
             }
         )
-
-        const item = await Forma.library.createItem({
-            data: { name: "OS Buildings", status: "success", urn: res.urn }
-        })
-        console.log("done")
     } catch (error) {
         console.error("Failed to process and render project GeoJSON:", error);
         throw error;
@@ -67,7 +62,6 @@ function adjustBBoxWithRefPoint(bbox, refPoint, projString) {
 
 // Utility function to fetch data from the ArcGIS FeatureServer
 async function fetchGeoJSONFromBBoxWithPagination(bbox, apiKey) {
-    // Destructure the bbox array into individual components for clarity
     const [southWestLongitude, southWestLatitude, northEastLongitude, northEastLatitude] = bbox;
 
     // Initialize variables for pagination
@@ -108,25 +102,6 @@ async function fetchGeoJSONFromBBoxWithPagination(bbox, apiKey) {
     }
 
     return buildings;
-}
-
-
-function recenterGeoJSON(inputGeoJSON, refPoint, sourceSRID, targetSRID) {
-    // Ensure reference point is in the correct format and CRS
-    const adjustAndReprojectCoordinates = (coords) => {
-        // First, project input coords to targetSRID
-        let projectedCoords = proj4(sourceSRID, targetSRID, coords);
-        return projectedCoords
-    };
-
-    // Apply the transformation to every point in the GeoJSON
-    turf.coordEach(inputGeoJSON, (currentCoord) => {
-        const transformedCoord = adjustAndReprojectCoordinates(currentCoord);
-        currentCoord[0] = transformedCoord[0];
-        currentCoord[1] = transformedCoord[1];
-    });
-
-    return inputGeoJSON;
 }
 
 
