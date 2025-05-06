@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import * as THREE from "three";
 import {
   computeBoundsTree,
@@ -11,14 +10,11 @@ import { Forma } from "forma-embedded-view-sdk/auto";
 const colors = ["rgba(255, 0, 0, 0.9)", "rgba(23, 115, 13, 0.9)"];
 
 // Speed up raycasting using https://github.com/gkjohnson/three-mesh-bvh
-// @ts-expect-error
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
-// @ts-expect-error
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 const raycaster = new THREE.Raycaster();
 // For this analysis we only need the first hit, which is faster to compute
-// @ts-expect-error
 raycaster.firstHitOnly = true;
 
 export const SCALE = 1;
@@ -47,8 +43,6 @@ export async function calculateAndDrawFootprint() {
   const material = new THREE.MeshBasicMaterial();
   material.side = THREE.DoubleSide;
 
-  //@ts-expect-error
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   geometry.computeBoundsTree();
 
   const mesh = new THREE.Mesh(geometry, material);
@@ -106,8 +100,6 @@ export default function CalculateAndDraw() {
     const material = new THREE.MeshBasicMaterial();
     material.side = THREE.DoubleSide;
 
-    //@ts-expect-error
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     geometry.computeBoundsTree();
 
     const mesh = new THREE.Mesh(geometry, material);

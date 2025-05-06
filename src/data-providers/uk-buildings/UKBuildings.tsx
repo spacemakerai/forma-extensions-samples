@@ -1,8 +1,6 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { Bbox } from "forma-embedded-view-sdk/terrain";
 import proj4 from "proj4";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 import { coordEach } from "@turf/meta";
 
 export async function processAndRenderProjectGeojson(apiKey: string) {
@@ -54,7 +52,7 @@ export async function processAndRenderProjectGeojson(apiKey: string) {
         },
       })),
     };
-    const res = await Forma.experimental.geodata.normalizeVectorData({
+    const res = await Forma.geoData.upload({
       data: geoJsonWithHeightAndElevation,
       dataType: "buildings",
     });
@@ -173,7 +171,6 @@ function recenterGeoJSON(
   };
 
   // Apply the transformation to every point in the GeoJSON
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   coordEach(inputGeoJSON, (currentCoord: number[]) => {
     const transformedCoord = adjustAndReprojectCoordinates(currentCoord);
     currentCoord[0] = transformedCoord[0];

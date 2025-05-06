@@ -1,7 +1,8 @@
 import { Forma } from "forma-embedded-view-sdk/auto";
 import { Vec3 } from "forma-embedded-view-sdk/design-tool";
+import { type BatchIngestElementsV2 } from "forma-embedded-view-sdk/integrate-elements";
 import proj4 from "proj4";
-import { TypedArray } from "three";
+import { type TypedArray } from "three";
 
 export const WGS84CRS = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
 
@@ -60,7 +61,8 @@ export async function createElementFromGlb(
   });
 
   const element = {
-    id: "some-element-id",
+    operation: "create",
+    urn: Forma.integrateElements.createUrn(Forma.getProjectId()),
     children: [],
     properties: {
       geometry: {
@@ -69,11 +71,12 @@ export async function createElementFromGlb(
         s3Id: fileId,
       },
     },
-  };
+  } satisfies BatchIngestElementsV2.CreateElement;
 
   const scale = 1; // Model is assumed to be in meters
   const scalingElement = {
-    id: "root",
+    operation: "create",
+    urn: Forma.integrateElements.createUrn(Forma.getProjectId()),
     properties: {
       //This is where we tell Forma "where in the world is the data". If missing or wrong, it won't be placed correctly in the scene.
       geoReference: {
@@ -84,26 +87,42 @@ export async function createElementFromGlb(
     },
     children: [
       {
-        id: element.id,
+        urn: element.urn,
         transform: [
-          [scale, 0, 0, 0],
-          [0, scale, 0, 0],
-          [0, 0, scale, 0],
-          [0, 0, 0, 1],
-        ].flat(),
+          // prettier-ignore
+          scale,
+          0,
+          0,
+          0,
+          0,
+          scale,
+          0,
+          0,
+          0,
+          0,
+          scale,
+          0,
+          0,
+          0,
+          0,
+          1,
+        ],
       },
     ],
-  };
+  } satisfies BatchIngestElementsV2.CreateElement;
 
-  const { urn } = await Forma.integrateElements.createElementHierarchy({
-    authcontext: Forma.getProjectId(),
-    data: {
-      rootElement: scalingElement.id,
-      elements: { [scalingElement.id]: scalingElement, [element.id]: element },
-    },
+  const { items } = await Forma.integrateElements.batchIngestElementsV2({
+    items: [element, scalingElement],
   });
 
-  return urn;
+  for (const item of items) {
+    if (item.status !== "ok") {
+      console.error("Failed to create element:", item);
+      throw new Error("Failed to create element");
+    }
+  }
+
+  return element.urn;
 }
 
 export async function putInLibrary(urn: string, name: string) {

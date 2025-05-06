@@ -54,7 +54,7 @@ export default function CalculateAndStore({ steepnessThreshold }: Props) {
     );
 
     //@ts-expect-error
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+
     geometry.computeBoundsTree();
 
     const material = new THREE.MeshBasicMaterial();

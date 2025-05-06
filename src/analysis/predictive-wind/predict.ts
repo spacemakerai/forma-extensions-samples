@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Forma } from "forma-embedded-view-sdk/auto";
 import * as THREE from "three";
 import { generateHeightMaps } from "./raycastProcessor.ts";
@@ -6,9 +5,7 @@ import { computeBoundsTree, disposeBoundsTree } from "three-mesh-bvh";
 import { PredictiveAnalysisGroundGrid } from "forma-embedded-view-sdk/predictive-analysis";
 
 // Speed up raycasting using https://github.com/gkjohnson/three-mesh-bvh
-// @ts-expect-error
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
-// @ts-expect-error
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
 
 export async function predictWind() {
@@ -104,8 +101,6 @@ async function getSceneWithTerrain() {
     "position",
     new THREE.BufferAttribute(terrainVertexPositions, 3),
   );
-  // @ts-expect-error
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   terrainGeometry.computeBoundsTree();
   terrainScene.add(
     new THREE.Mesh(
@@ -128,8 +123,6 @@ async function getSceneWithoutVirtual() {
     "position",
     new THREE.BufferAttribute(allGeometryVertexPositions, 3),
   );
-  // @ts-expect-error
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   allGeometry.computeBoundsTree();
   allScene.add(
     new THREE.Mesh(
