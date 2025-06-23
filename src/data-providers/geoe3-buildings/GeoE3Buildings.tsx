@@ -46,7 +46,7 @@ export function GeoE3Buildings() {
     const bbox = polygonToBbox(transformedPolygon);
     const bbox_string = bbox.flat().join(",");
     fetch(
-      `https://geoe3platform.eu/geoe3/buildings3d/search?collections=buildings3d_FI&bbox=${bbox_string}&f=cityjson`,
+      `https://locationeurope.eu/geoe3/buildings3d/search?collections=buildings3d_FI&bbox=${bbox_string}&f=cityjson`,
     )
       .then((res) => res.json())
       .then((json: object) => {
