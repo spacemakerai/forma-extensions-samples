@@ -1,0 +1,7 @@
+ignoredBuiltDependencies:
+  - esbuild
+
+minimumReleaseAge: 2880
+
+minimumReleaseAgeExclude:
+  - '@spacemakerai/*'
